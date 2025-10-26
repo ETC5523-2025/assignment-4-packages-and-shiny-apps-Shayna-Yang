@@ -1,16 +1,18 @@
 Package: shayhai
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Healthcare-Associated Infection (HAI) Data and Summarise Tools
 Version: 0.1.0
 Authors@R: c(
     person(
-      "Jane", "Doe",
-      email = "jane@example.com",
+      "Tzu-Hsuan", "Yang",
+      email = "tyan0082@student.monash.edu",
       role = c("aut", "cre")
     )
   )
-Description: More about what it does (maybe more than one line).
-    Continuation lines should be indented.
+Description: Provides a simulated dataset representing healthcare-associated 
+    infections (HAIs) and functions to summarise and visualise 
+    infection burden. Includes an interactive Shiny app to explore 
+    estimated infections, deaths, and DALYs.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -20,3 +22,10 @@ Suggests:
 VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
+Depends: 
+    R (>= 3.5)
+Imports:
+    dplyr,
+    tibble,
+    ggplot2,
+    shiny

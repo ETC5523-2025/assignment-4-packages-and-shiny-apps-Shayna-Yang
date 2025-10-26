@@ -1,0 +1,13 @@
+utils::globalVariables(c(
+  "infection_type",
+  "weight_pop",
+  "died",
+  "yll",
+  "yld",
+  "daly",
+  "n_hai_est",
+  "deaths_est",
+  "ylls_est",
+  "ylds_est",
+  "dalys_est"
+))
