@@ -1,9 +1,5 @@
-library(tibble)
-library(dplyr)
-library(usethis)
-
 # 1. numbers of parameters each infection
-targets <- tribble(
+targets <- tibble::tribble(
   ~infection_type, ~n_hai_point, ~deaths_point, ~ylls_point, ~ylds_point,
   "HAP", 106586, 3968, 41306, 27539,
   "SSI", 93228, 2328, 28376, 452,
@@ -11,7 +7,7 @@ targets <- tribble(
   "UTI", 214150, 3664, 44871, 20423,
   "CDI", 36002, 1917, 19937, 977
 ) |>
-  mutate(
+  dplyr::mutate(
     p_death = deaths_point / n_hai_point,
     yll_per_death = ylls_point / deaths_point,
     yld_per_case = ylds_point / n_hai_point
@@ -41,24 +37,24 @@ simulate_shayhai_cases <- function(n_cases = 5000, seed = 5523) {
   age_draw <- sample(age_groups, size = n_cases, replace = TRUE, prob = age_weights)
   sex_draw <- sample(sex_levels, size = n_cases, replace = TRUE, prob = sex_weights)
 
-  df <- tibble(case_id = 1:n_cases, infection_type = infection_draw,
+  df <- tibble::tibble(case_id = 1:n_cases, infection_type = infection_draw,
                age_group = age_draw, sex = sex_draw) |>
-    left_join(targets, by = "infection_type") |>
-    rowwise() |>
-    mutate(
-      died = rbinom(1, 1, p_death),
-      yll = if (died == 1) yll_per_death * runif(1, 0.8, 1.2) else 0,
-      yld = yld_per_case * runif(1, 0.8, 1.2),
+    dplyr::left_join(targets, by = "infection_type") |>
+    dplyr::rowwise() |>
+    dplyr::mutate(
+      died = stats::rbinom(1, 1, p_death),
+      yll = if (died == 1) yll_per_death * stats::runif(1, 0.8, 1.2) else 0,
+      yld = yld_per_case * stats::runif(1, 0.8, 1.2),
       daly = yll + yld
     ) |>
-    ungroup()
+    dplyr::ungroup()
   # weighted
-  n_type <- df |> count(infection_type, name = "n_sim")
+  n_type <- df |> dplyr::count(infection_type, name = "n_sim")
   df <- df |>
-    left_join(n_type, by = "infection_type") |>
-    mutate(weight_pop = n_hai_point / n_sim)
+    dplyr::left_join(n_type, by = "infection_type") |>
+    dplyr::mutate(weight_pop = n_hai_point / n_sim)
 
-  df |> select(case_id, infection_type, age_group, sex, died, yll, yld, daly, weight_pop)
+  df |> dplyr::select(case_id, infection_type, age_group, sex, died, yll, yld, daly, weight_pop)
 }
 
 shayhai_cases <- simulate_shayhai_cases()
