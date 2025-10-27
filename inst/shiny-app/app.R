@@ -5,11 +5,12 @@ library(dplyr)
 library(ggplot2)
 library(tidyr)
 library(bslib)
+library(plotly)
 
 # 1. Data from package
 
-data("shayhai_cases", package = "shayhai") # German PPS
-data("shayhai_cases_ecdc", package = "shayhai") # ECDC PPS
+data("shayhai_cases", package = "shayhai")       # German PPS
+data("shayhai_cases_ecdc", package = "shayhai")  # ECDC PPS
 
 shayhai_cases <- shayhai_cases |>
   mutate(module = "German PPS")
@@ -19,299 +20,572 @@ shayhai_cases_ecdc <- shayhai_cases_ecdc |>
 
 all_cases <- bind_rows(shayhai_cases, shayhai_cases_ecdc)
 
-infection_choices <- sort(unique(all_cases$infection_type))
-module_choices    <- sort(unique(all_cases$module))
-sex_choices       <- sort(unique(all_cases$sex))
-age_choices       <- sort(unique(all_cases$age_group))
+infection_choices <- c("HAP", "SSI", "BSI", "UTI", "CDI")
+module_choices <- c("German PPS", "ECDC PPS")
+sex_choices <- c("Female", "Male")
+age_choices <- c(
+  "0-1","2-4","5-9","10-14","15-19","20-24",
+  "25-34","35-44","45-54","55-64",
+  "65-74","75-79","80-84","85+"
+)
 
 # UI
 ui <- navbarPage(
   title = "shayhai: HAI Explorer",
-  theme = bslib::bs_theme(version = 5, bootswatch = "flatly"),
-  header = tags$head(
-    tags$link(rel = "stylesheet", type = "text/css", href = "app.css")
+  theme = bs_theme(
+    version = 5,
+    bootswatch = "flatly"
   ),
+  header = tags$head(
+    tags$link(
+      rel = "stylesheet",
+      href = "https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&display=swap"
+    ),
+
+    tags$link(
+      rel = "stylesheet",
+      type = "text/css",
+      href = "app.css"
+    )
+  ),
+
+  # panel 1: bubble
   tabPanel(
-    "Explore",
+    "Bubble plot",
     sidebarLayout(
       sidebarPanel(
         width = 3,
+        h4("Filters"),
+        checkboxGroupInput("infection_type", "Infection type(s)",
+                           choices  = infection_choices,
+                           selected = infection_choices),
+
+        checkboxGroupInput("module", "Survey module(s)",
+                           choices  = module_choices,
+                           selected = module_choices),
+
+        checkboxGroupInput("sex", "Sex",
+                           choices  = sex_choices,
+                           selected = sex_choices),
+
+        checkboxGroupInput("age_group", "Age group(s)",
+                           choices  = age_choices,
+                           selected = age_choices),
+        tags$hr(),
+
+      ),
+      mainPanel(
+        width = 9,
         div(class = "card-box",
-            h4("Filters"),
-            selectInput("infection_type", "Infection type(s)",
-                        choices  = infection_choices,
-                        selected = infection_choices,
-                        multiple = TRUE
-            ),
-            selectInput("module", "Survey module(s)",
-                        choices  = module_choices,
-                        selected = module_choices,
-                        multiple = TRUE
-            ),
-            selectInput("sex", "Sex",
-                        choices  = sex_choices,
-                        selected = sex_choices,
-                        multiple = TRUE
-            ),
-            selectInput("age_group", "Age group(s)",
-                        choices  = age_choices,
-                        selected = age_choices,
-                        multiple = TRUE
-            ),
-            tags$hr(),
-            div(class = "plot-card-title", "Field glossary"),
+            h4("Bubble plot: DALYs vs deaths vs cases"),
+            plotlyOutput("bubble_plot", height = "500px"),
             tags$small(
-              tags$ul(
-                tags$li(tags$b("HAP"), " = healthcare-associated pneumonia"),
-                tags$li(tags$b("UTI"), " = urinary tract infection"),
-                tags$li(tags$b("BSI"), " = primary bloodstream infection"),
-                tags$li(tags$b("SSI"), " = surgical-site infection"),
-                tags$li(tags$b("CDI"), " = ",
-                        tags$i("Clostridioides difficile"), " infection")
-              ),
-              tags$br(),
-              tags$b("DALY"), " = YLL (years of life lost) + YLD (years lived with disability).",
-              tags$br(),
-              tags$b("weight_pop"), ": Weights to evalute the population.", tags$br(),
-              tags$b("died"), ": 1 means attributing complications and death to a HAI"
+              "Each bubble = infection type; ",
+              "X = Number of HAIs, Y = Attributable deaths; ",
+              "Bubble size = DALYs; Color = Survey module (German PPS / ECDC PPS)."
             )
+        )
+      )
+    )
+  ),
+
+  # panel: bar
+  tabPanel(
+    "Bar plot with 95% UI",
+    sidebarLayout(
+      sidebarPanel(
+        width = 3,
+        h4("Filters"),
+
+        checkboxGroupInput("infection_type_bar", "Infection type(s)",
+                           choices  = infection_choices,
+                           selected = infection_choices),
+
+        checkboxGroupInput("module_bar", "Survey module(s)",
+                           choices  = module_choices,
+                           selected = module_choices),
+
+        checkboxGroupInput("sex_bar", "Sex",
+                           choices  = sex_choices,
+                           selected = sex_choices),
+
+        checkboxGroupInput("age_group_bar", "Age group(s)",
+                           choices  = age_choices,
+                           selected = age_choices),
+
+        tags$hr(),
+        radioButtons(
+          "metric_bar",
+          "Choose metric:",
+          choices = c("Attributable deaths per 100,000" = "deaths",
+                      "DALYs per 100,000"               = "dalys"),
+          selected = "deaths"
         )
       ),
 
       mainPanel(
         width = 9,
-        h4("Interactive HAI burden views"),
-
-        fluidRow(
-          column(
-            width = 6,
-            div(class = "card-box",
-                div(class = "plot-card-title", "Bubble plot"),
-                plotOutput("bubble_plot", height = "300px"),
-                tags$small(
-                  "Each bubble = A type of HAI; ",
-                  "X = Number of HAIs, Y = Number of attributable deaths; ",
-                  "The diameter of the bubbles is proportional to the annual numbers of DALYs,
-                  colour = Survey Module (German PPS / ECDC PPS)."
-                )
-            )
-          ),
-          column(
-            width = 6,
-            div(class = "card-box",
-                div(class = "plot-card-title", "Bar Plot with 95% UI"),
-                plotOutput("bar_plot", height = "300px"),
-                tags$small(
-                  "Y = Attributable deaths，The error bars indicate ",
-                  tags$b("95% uncertainty interval (UI)")
-                )
-            )
-          )
-        ),
-
-        fluidRow(
-          column(
-            width = 12,
-            div(class = "card-box",
-                div(class = "plot-card-title", "Age pyramid"),
-                plotOutput("pyramid_plot", height = "400px"),
-                tags$small(
-                  "Left = Female, Right = MALE; ",
-                  "Width = Number of DALYs (all infections)",
-                  "Use filters to focus on a specific infection or module."
-                )
-            )
-          )
-        ),
-
-        tags$hr(),
-        h5(tags$b("How to interpret the dashboard")),
-        tags$ul(
-          tags$li(tags$b("Filters:"),
-                  "Select infection type(s), survey module(s), sex, and age group(s)."),
-          tags$li(tags$b("Bubble plot:"),
-                  "Shows which infections cause the most cases, deaths, and DALYs."),
-          tags$li(tags$b("Bar plot:"), "Compares infections with",
-                  tags$b("95% uncertainty intervals (UI)"), "."),
-          tags$li(tags$b("Age pyramid:"),
-                  "Shows which age/sex groups bear the largest health burden.")
+        div(class = "card-box",
+            h4("Annual burden by infection type"),
+            plotlyOutput("bar_plot", height = "520px")
         )
       )
     )
   ),
 
-  # ---- TAB: About ----
+  # panel: Age pyramid
+  tabPanel(
+    "Age pyramid",
+    sidebarLayout(
+      sidebarPanel(
+        width = 3,
+        h4("Filters"),
+        checkboxGroupInput("infection_type_pyr", "Infection type(s)",
+                           choices  = infection_choices,
+                           selected = infection_choices),
+
+        checkboxGroupInput("module_pyr", "Survey module(s)",
+                           choices  = module_choices,
+                           selected = module_choices),
+
+        checkboxGroupInput("sex_pyr", "Sex",
+                           choices  = sex_choices,
+                           selected = sex_choices),
+
+        checkboxGroupInput("age_group_pyr", "Age group(s)",
+                           choices  = age_choices,
+                           selected = age_choices),
+      ),
+      mainPanel(
+        width = 9,
+        div(class = "card-box",
+            h4("Age pyramid: Weighted DALYs by sex and age group"),
+            plotlyOutput("pyramid_plot", height = "500px"),
+            tags$small(
+              "Left = Female, Right = Male; Width = total DALYs. ",
+              "Use filters to focus on a specific infection or module."
+            )
+        )
+      )
+    )
+  ),
+
+  # panel: summary table
+  tabPanel(
+    "Summary table",
+    fluidPage(
+      div(class = "card-box",
+          h4("Annual burden per 100,000 population"),
+          tags$small(
+            "Structure inspired by Table 2 of the report. ",
+            "Cells show point estimate per 100,000 (95% UI). ",
+            "95% UI here is an illustrative ±10% interval."
+          ),
+          DT::dataTableOutput("summary_table")
+      )
+    )
+  ),
+
+  # panel: About
   tabPanel(
     "About",
     div(class = "card-box",
-        h4("About the data"),
-        p("This app uses the German and ECDC PPS datasets included in the ",
-          tags$code("shayhai"), " package. Each row represents a simulated case, ",
-          "weighted to represent its contribution to the total population burden."),
-        h4("Computed metrics"),
+        h3("About this app"),
+        p("This Shiny app is part of the ", tags$code("shayhai"), " package."),
+        p("It visualises simulated estimates of the burden of ",
+          tags$b("healthcare-associated infections (HAIs)"),
+          " based on two sources: the German PPS (2011) and the ECDC PPS (EU/EEA, 2011–2012)."),
+        tags$hr(),
+
+        h4("Purpose"),
+        p("The goal is to help users explore differences in HAI burden across infection types, ",
+          "survey modules (German vs EU/EEA), and demographic subgroups (age, sex)."),
+        tags$hr(),
+
+        h4("Field glossary"),
         tags$ul(
-          tags$li(tags$b("Cases"), " = sum(weight_pop)"),
-          tags$li(tags$b("Deaths"), " = sum(weight_pop * died)"),
-          tags$li(tags$b("DALYs"), " = sum(weight_pop * daly)")
+          tags$li(tags$b("HAP"), " = healthcare-associated pneumonia"),
+          tags$li(tags$b("UTI"), " = urinary tract infection"),
+          tags$li(tags$b("BSI"), " = primary bloodstream infection"),
+          tags$li(tags$b("SSI"), " = surgical-site infection"),
+          tags$li(tags$b("CDI"), " = ", tags$i("Clostridioides difficile"), " infection")
         ),
+        tags$br(),
+        tags$b("DALY"), " = YLL (years of life lost) + YLD (years lived with disability).",
+        tags$hr(),
+
+        h4("Data description"),
+        p("Each record in the dataset represents a simulated HAI case, ",
+          "weighted by ", tags$code("weight_pop"), " to represent its contribution to the population-level burden."),
+        tags$ul(
+          tags$li(tags$code("infection_type"), " – infection category (HAP, SSI, BSI, UTI, CDI)"),
+          tags$li(tags$code("module"), " – data source (German PPS, ECDC PPS)"),
+          tags$li(tags$code("sex"), " – Male or Female"),
+          tags$li(tags$code("age_group"), " – 14 age bands from 0–1 up to 85+"),
+          tags$li(tags$code("died"), " – 1 if the simulated case resulted in death, else 0"),
+          tags$li(tags$code("yll"), " – years of life lost for that case"),
+          tags$li(tags$code("yld"), " – years lived with disability for that case"),
+          tags$li(tags$code("daly"), " – sum of YLL and YLD"),
+          tags$li(tags$code("weight_pop"), " – scaling weight to extrapolate the case to population totals")
+        ),
+        tags$hr(),
+
+        h4("How to interpret the plots"),
+        tags$ul(
+          tags$li(tags$b("Bubble plot:"),
+                  " Each bubble represents one infection type. ",
+                  "X = number of HAIs (weighted), Y = attributable deaths (weighted), ",
+                  "bubble size = DALYs (weighted). Colours show survey module."),
+          tags$li(tags$b("Bar plot:"),
+                  " Shows the burden by infection type, with separate bars for German PPS and ECDC PPS. ",
+                  "Error bars indicate the ", tags$b("95% uncertainty interval (UI)"),
+                  " shown here as a placeholder ±10% around the estimate. ",
+                  "Colours are fixed: German PPS = steelblue, ECDC PPS = coral."),
+          tags$li(tags$b("Age pyramid:"),
+                  " Displays DALYs by age and sex. ",
+                  "Left = Female, Right = Male; bar represents total DALYs (weighted).")
+        ),
+        tags$hr(),
+
         h4("Uncertainty intervals"),
-        p("Bar plots illustrate ",
-          tags$b("95% uncertainty intervals (UIs)"),
-          " conceptually (currently ±10% of the estimate).")
+        p("Bars display ", tags$b("95% uncertainty intervals (UIs)"),
+          " as placeholders (±10% of the estimate). ",
+          "In the real BHAI workflow, these would be derived from modelled posterior distributions (2.5th–97.5th quantiles)."),
+        tags$hr(),
+
+        h4("References"),
+        tags$ul(
+          tags$li("Zacher B. et al. (2019). ",
+                  tags$i("Burden of healthcare-associated infections in Germany: results of the burden of communicable diseases in Europe study (BCoDE)."),
+                  " Eurosurveillance 24(46): 1900135. ",
+                  tags$a(href="https://www.eurosurveillance.org/content/10.2807/1560-7917.ES.2019.24.46.1900135",
+                         "View article", target="_blank")),
+          tags$li("Cassini A. et al. (2016). ",
+                  tags$i("Burden of Six Healthcare-Associated Infections on European Population Health: Estimating Incidence-Based Disability-Adjusted Life Years through a Population Prevalence-Based Modelling Study."),
+                  " PLoS Med 13(10): e1002150.")
+        )
     )
   )
 )
 
-
 # Server
 server <- function(input, output, session) {
 
-  filtered_data <- reactive({
-    all_cases %>%
+  filter_cases <- function(infection, module, sex, age) {
+    all_cases |>
       filter(
-        infection_type %in% input$infection_type,
-        module         %in% input$module,
-        sex            %in% input$sex,
-        age_group      %in% input$age_group
+        infection_type %in% infection,
+        module %in% module,
+        sex %in% sex,
+        age_group %in% age
       )
-  })
+  }
 
   # Bubble
-  bubble_data <- reactive({
-    filtered_data() %>%
-      group_by(infection_type, module) %>%
+  output$bubble_plot <- renderPlotly({
+    df <- filter_cases(input$infection_type, input$module, input$sex, input$age_group) |>
+      group_by(infection_type, module) |>
       summarise(
         cases_est  = sum(weight_pop, na.rm = TRUE),
         deaths_est = sum(weight_pop * died, na.rm = TRUE),
         dalys_est  = sum(weight_pop * daly, na.rm = TRUE),
         .groups = "drop"
       )
-  })
+    validate(need(nrow(df) > 0, "No data for current filter."))
 
-  output$bubble_plot <- renderPlot({
-    df <- bubble_data()
-    validate(need(nrow(df) > 0, "No data for current filter (bubble plot)."))
-
-    xmax <- max(df$cases_est,  na.rm = TRUE) * 1.1
-    ymax <- max(df$deaths_est, na.rm = TRUE) * 1.1
-    dmax <- max(df$dalys_est,  na.rm = TRUE)
-
-    ggplot(df, aes(x = cases_est, y = deaths_est)) +
-      # bubble
-      geom_point(
-        aes(size = dalys_est, color = module),
-        alpha = 0.6
+    p <- ggplot(df, aes(x = cases_est, y = deaths_est,
+                        size = dalys_est, color = module,
+                        text = paste(
+                          "Infection:", infection_type,
+                          "<br>Module:", module,
+                          "<br>Cases:", round(cases_est),
+                          "<br>Deaths:", round(deaths_est),
+                          "<br>DALYs:", round(dalys_est)
+                        ))) +
+      geom_point(alpha = 0.6) +
+      geom_text(aes(label = infection_type), vjust = -0.7, size = 3) +
+      scale_size_area(max_size = 20) +
+      scale_color_manual(
+        values = c("German PPS" = "steelblue", "ECDC PPS" = "coral")
       ) +
-      # label with infection type
-      geom_text(
-        aes(label = infection_type),
-        vjust = -0.7,
-        size = 3
-      ) +
-      scale_size_area(limits = c(0, dmax), max_size = 18) +
-      scale_x_continuous(limits = c(0, xmax)) +
-      scale_y_continuous(limits = c(0, ymax)) +
-      labs(
-        x = "Number of HAIs (weighted)",
-        y = "Attributable deaths (weighted)",
-        size = "DALYs (weighted)",
-        color = "Survey module"
-      ) +
+      labs(x = "Number of HAIs (weighted)",
+           y = "Attributable deaths (weighted)",
+           size = "DALYs (weighted)",
+           color = "Survey module") +
       theme_minimal()
+    ggplotly(p, tooltip = "text")
   })
 
   # Bar plot
-  bar_data <- reactive({
-    filtered_data() %>%
-      group_by(infection_type, module) %>%
+  output$bar_plot <- renderPlotly({
+    df <- filter_cases(
+      infection = input$infection_type_bar,
+      module    = input$module_bar,
+      sex       = input$sex_bar,
+      age       = input$age_group_bar
+    ) |>
+      group_by(infection_type, module) |>
       summarise(
         deaths_est = sum(weight_pop * died, na.rm = TRUE),
+        dalys_est  = sum(weight_pop * daly, na.rm = TRUE),
         .groups = "drop"
-      ) %>%
+      ) |>
       mutate(
-        ui_low  = deaths_est * 0.9,
-        ui_high = deaths_est * 1.1
+        # 95% UI placeholder (±10%)
+        ui_low_death  = deaths_est * 0.9,
+        ui_high_death = deaths_est * 1.1,
+        ui_low_daly   = dalys_est * 0.9,
+        ui_high_daly  = dalys_est * 1.1,
+
+        infection_type = factor(
+          infection_type,
+          levels = c("HAP","SSI","BSI","UTI","CDI")
+        ),
+        module = factor(
+          module,
+          levels = c("German PPS","ECDC PPS")
+        )
       )
+
+    validate(need(nrow(df) > 0, "No data for current filter."))
+
+    metric <- input$metric_bar
+
+    if (metric == "deaths") {
+      p <- ggplot(
+        df,
+        aes(
+          x = infection_type,
+          y = deaths_est,
+          fill = module,
+          text = paste(
+            "Infection:", infection_type,
+            "<br>Module:", module,
+            "<br>Attributable deaths:", round(deaths_est, 1),
+            "<br>95% UI:",
+            paste0(round(ui_low_death, 1), " – ", round(ui_high_death, 1))
+          )
+        )
+      ) +
+        geom_col(
+          position = position_dodge(width = 0.7),
+          width = 0.6
+        ) +
+        geom_errorbar(
+          aes(ymin = ui_low_death, ymax = ui_high_death),
+          position = position_dodge(width = 0.7),
+          width = 0.2
+        ) +
+        scale_fill_manual(
+          values = c("German PPS" = "steelblue",
+                     "ECDC PPS"   = "coral"),
+          name = "Survey module"
+        ) +
+        labs(
+          x   = "Infection type",
+          y   = "Attributable deaths (weighted)"
+        ) +
+        theme_minimal() +
+        theme(
+          panel.grid.minor = element_blank(),
+          panel.grid.major.y = element_line(color = "grey90")
+        )
+
+    } else { # metric == "dalys"
+      p <- ggplot(
+        df,
+        aes(
+          x = infection_type,
+          y = dalys_est,
+          fill = module,
+          text = paste(
+            "Infection:", infection_type,
+            "<br>Module:", module,
+            "<br>DALYs:", round(dalys_est, 1),
+            "<br>95% UI:",
+            paste0(round(ui_low_daly, 1), " – ", round(ui_high_daly, 1))
+          )
+        )
+      ) +
+        geom_col(
+          position = position_dodge(width = 0.7),
+          width = 0.6
+        ) +
+        geom_errorbar(
+          aes(ymin = ui_low_daly, ymax = ui_high_daly),
+          position = position_dodge(width = 0.7),
+          width = 0.2
+        ) +
+        scale_fill_manual(
+          values = c("German PPS" = "steelblue",
+                     "ECDC PPS"   = "coral"),
+          name = "Survey module"
+        ) +
+        labs(
+          x   = "Infection type",
+          y   = "DALYs (weighted)"
+        ) +
+        theme_minimal() +
+        theme(
+          panel.grid.minor = element_blank(),
+          panel.grid.major.y = element_line(color = "grey90")
+        )
+    }
+
+    ggplotly(p, tooltip = "text")
   })
-
-  output$bar_plot <- renderPlot({
-    df <- bar_data()
-    validate(need(nrow(df) > 0, "No data for current filter (bar plot)."))
-
-    df <- df %>%
-      mutate(infection_type = factor(infection_type, levels = infection_choices))
-
-    ymax <- max(df$ui_high, na.rm = TRUE) * 1.1
-
-    ggplot(df, aes(x = infection_type, y = deaths_est, fill = module)) +
-      geom_col(
-        position = position_dodge(width = 0.6),
-        width    = 0.6,
-        alpha    = 0.8
-      ) +
-      geom_errorbar(
-        aes(ymin = ui_low, ymax = ui_high),
-        position = position_dodge(width = 0.6),
-        width    = 0.2,
-        linewidth = 0.4
-      ) +
-      scale_y_continuous(limits = c(0, ymax)) +
-      coord_flip() +
-      labs(
-        x   = "Infection type",
-        y   = "Attributable deaths (weighted)",
-        fill = "Survey module"
-      ) +
-      theme_minimal() +
-      theme(panel.grid.minor = element_blank())
-  })
-
   # Age Pyramid
-  pyramid_data <- reactive({
-    filtered_data() %>%
-      group_by(age_group, sex) %>%
+  output$pyramid_plot <- renderPlotly({
+    df <- filter_cases(input$infection_type_pyr, input$module_pyr,
+                       input$sex_pyr, input$age_group_pyr) |>
+      group_by(age_group, sex) |>
       summarise(
         daly_weighted = sum(weight_pop * daly, na.rm = TRUE),
         .groups = "drop"
-      ) %>%
-      # standardise to lower for pivot
-      mutate(sex = tolower(sex)) %>%
-      tidyr::pivot_wider(
-        names_from  = sex,
-        values_from = daly_weighted,
-        values_fill = 0
-      ) %>%
-      # make sure both columns exist even if filtered to only one sex
+      ) |>
+      mutate(sex = tolower(sex)) |>
+      pivot_wider(names_from = sex, values_from = daly_weighted, values_fill = 0) |>
       mutate(
         female = ifelse(is.na(female), 0, female),
         male   = ifelse(is.na(male),   0, male)
-      ) %>%
+      ) |>
       arrange(age_group)
+    validate(need(nrow(df) > 0, "No data for current filter."))
+
+    p <- ggplot() +
+      geom_col(data = df, aes(x = age_group, y = -female,
+                              text = paste("Age:", age_group,
+                                           "<br>Sex: Female",
+                                           "<br>DALYs:", round(female))),
+               alpha = 1, fill = "coral") +
+      geom_col(data = df, aes(x = age_group, y = male,
+                              text = paste("Age:", age_group,
+                                           "<br>Sex: Male",
+                                           "<br>DALYs:", round(male))),
+               alpha = 1, fill = "steelblue") +
+      coord_flip() +
+      labs(x = "Age group", y = "DALYs (weighted)") +
+      theme_minimal()
+    ggplotly(p, tooltip = "text")
   })
 
-  output$pyramid_plot <- renderPlot({
-    df <- pyramid_data()
-    validate(need(nrow(df) > 0, "No data for current filter (age pyramid)."))
+  # --- helper to format "point (low–high)" -----------------
+  fmt_ui <- function(est) {
+    low  <- est * 0.9
+    high <- est * 1.1
+    paste0(
+      round(est, 1), " (",
+      round(low, 1), "–",
+      round(high, 1), ")"
+    )
+  }
 
-    ggplot() +
-      # Female to the left (negative)
-      geom_col(
-        data = df,
-        aes(x = age_group, y = -female),
-        alpha = 0.7
-      ) +
-      # Male to the right (positive)
-      geom_col(
-        data = df,
-        aes(x = age_group, y = male),
-        alpha = 0.7
-      ) +
-      coord_flip() +
-      labs(
-        x = "Age group",
-        y = "DALYs (weighted)"
-      ) +
-      theme_minimal()
+  # table
+  output$summary_table <- DT::renderDataTable({
+    df_filt <- filter_cases(
+      infection = input$infection_type,
+      module    = input$module,
+      sex       = input$sex,
+      age       = input$age_group
+    )
+    validate(need(nrow(df_filt) > 0, "No data for current filter."))
+
+    # compute denominator per module
+    denom_by_module <- df_filt |>
+      group_by(module) |>
+      summarise(
+        pop_equiv = sum(weight_pop, na.rm = TRUE),
+        .groups = "drop"
+      )
+    # compute totals by module x infection_type
+    by_inf <- df_filt |>
+      group_by(module, infection_type) |>
+      summarise(
+        cases_est  = sum(weight_pop, na.rm = TRUE),
+        deaths_est = sum(weight_pop * died, na.rm = TRUE),
+        dalys_est  = sum(weight_pop * daly, na.rm = TRUE),
+        .groups = "drop"
+      ) |>
+      left_join(denom_by_module, by = "module") |>
+      mutate(
+        rate_cases_per100k  = (cases_est  / pop_equiv) * 100000,
+        rate_deaths_per100k = (deaths_est / pop_equiv) * 100000,
+        rate_dalys_per100k  = (dalys_est  / pop_equiv) * 100000
+      )
+    # compute across infection types per module
+    by_all <- df_filt |>
+      group_by(module) |>
+      summarise(
+        cases_est  = sum(weight_pop, na.rm = TRUE),
+        deaths_est = sum(weight_pop * died, na.rm = TRUE),
+        dalys_est  = sum(weight_pop * daly, na.rm = TRUE),
+        .groups = "drop"
+      ) |>
+      left_join(denom_by_module, by = "module") |>
+      mutate(
+        infection_type = "All",
+        rate_cases_per100k  = (cases_est  / pop_equiv) * 100000,
+        rate_deaths_per100k = (deaths_est / pop_equiv) * 100000,
+        rate_dalys_per100k  = (dalys_est  / pop_equiv) * 100000
+      )
+
+    # combine infection-specific rows + All
+    rate_long <- bind_rows(by_inf, by_all)
+
+    # helper to build one block (e.g. "HAIs per 100,000")
+    block_cases <- rate_long |>
+      select(module, infection_type, value = rate_cases_per100k) |>
+      mutate(measure = "HAIs per 100,000")
+
+    block_deaths <- rate_long |>
+      select(module, infection_type, value = rate_deaths_per100k) |>
+      mutate(measure = "Attributable deaths per 100,000")
+
+    block_dalys <- rate_long |>
+      select(module, infection_type, value = rate_dalys_per100k) |>
+      mutate(measure = "DALYs per 100,000")
+
+    blocks <- bind_rows(block_cases, block_deaths, block_dalys)
+
+    # turn each numeric into "point (low–high)" string
+    blocks <- blocks |>
+      mutate(formatted = fmt_ui(value))
+
+    # spread infection types to columns
+    inf_order <- c("HAP","UTI","BSI","SSI","CDI","All")
+    blocks$infection_type <- factor(blocks$infection_type, levels = inf_order)
+
+    table_wide <- blocks |>
+      select(measure, module, infection_type, formatted) |>
+      tidyr::pivot_wider(
+        names_from  = infection_type,
+        values_from = formatted
+      ) |>
+      arrange(
+        factor(measure,
+               levels = c("HAIs per 100,000",
+                          "Attributable deaths per 100,000",
+                          "DALYs per 100,000")),
+        module
+      )
+    # final table
+    table_wide <- table_wide |>
+      rename(
+        `Annual burden measure` = measure,
+        Sample = module
+      )
+
+    DT::datatable(
+      table_wide,
+      rownames = FALSE,
+      options = list(
+        paging = FALSE,
+        searching = FALSE,
+        ordering = FALSE,
+        info = FALSE,
+        scrollX = TRUE
+      )
+    )
   })
 }
 

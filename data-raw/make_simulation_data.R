@@ -33,13 +33,14 @@ yll_prop_ger <- targets_ger |>
 
 # 2. Parameters for EU/EEA (ECDC PPS)
 #
-# Idea:
-# - Treat "per 100,000 population" as if it's the total burden in
-#   a reference population of exactly 100,000 people.
-# - So HAIs_per_100k  -> n_hai_point
-#   deaths_per_100k   -> deaths_point
-#   DALYs_per_100k    -> dalys_point
-# - Then split DALYs into YLL and YLD using Germany's YLL proportion.
+## Idea:
+## We scale the "per 100,000 population" rates up to a reference population
+## ref_pop_ecdc, so that total burden is on a similar magnitude to Germany.
+## This makes ECDC PPS comparable in the Shiny plots.
+## You can pick any sensible large population. Let's use 80 million
+## (roughly the size of a large EU country, similar to Germany's order).
+
+ref_pop_ecdc <- 80000000  # reference population size
 
 targets_ecdc_rates <- tibble::tribble(
   ~infection_type, ~hais_per_100k, ~deaths_per_100k, ~dalys_per_100k,
@@ -51,15 +52,19 @@ targets_ecdc_rates <- tibble::tribble(
   # "All" row not simulated as a type; we'll always compute "All" later by summing.
 )
 
-# join the YLL proportion from Germany to split EU/EEA DALYs into YLL vs YLD
+# join the German YLL proportion to split EU/EEA DALYs into YLL vs YLD
 targets_ecdc <- targets_ecdc_rates |>
   dplyr::left_join(yll_prop_ger, by = "infection_type") |>
   dplyr::mutate(
-    n_hai_point   = hais_per_100k,      # interpret per-100k as "this many cases in our ref pop"
-    deaths_point  = deaths_per_100k,
-    dalys_point   = dalys_per_100k,
-    ylls_point    = dalys_per_100k * prop_yll,
-    ylds_point    = dalys_per_100k * (1 - prop_yll),
+    # scale rates per 100k up to totals in a reference population
+    n_hai_point   = hais_per_100k    * (ref_pop_ecdc / 100000),
+    deaths_point  = deaths_per_100k  * (ref_pop_ecdc / 100000),
+    dalys_point   = dalys_per_100k   * (ref_pop_ecdc / 100000),
+
+    # split DALYs into YLL and YLD using German proportions
+    ylls_point    = dalys_point * prop_yll,
+    ylds_point    = dalys_point * (1 - prop_yll),
+
     p_death       = dplyr::if_else(n_hai_point > 0,
                                    deaths_point / n_hai_point, 0),
     yll_per_death = dplyr::if_else(deaths_point > 0,
