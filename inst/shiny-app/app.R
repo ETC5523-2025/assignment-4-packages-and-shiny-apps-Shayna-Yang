@@ -231,19 +231,28 @@ ui <- navbarPage(
         tags$hr(),
 
         h4("How to interpret the plots"),
+        p("Each plot provides a complementary perspective on the burden of healthcare-associated infections (HAIs). ",
+          "Together, they allow users to explore both the magnitude and the distribution of burden across infection types,
+          demographics, and survey modules. "),
         tags$ul(
           tags$li(tags$b("Bubble plot:"),
-                  " Each bubble represents one infection type. ",
-                  "X = number of HAIs (weighted), Y = attributable deaths (weighted), ",
-                  "bubble size = DALYs (weighted). Colours show survey module."),
+                  "Each bubble represents one infection type (HAP, SSI, BSI, UTI, or CDI). ",
+                  "X = number of HAIs (weighted), Y = attributable deaths (weighted). ",
+                  "The diameter of the bubbles is proportional to the annual numbers of DALYs.
+                  Bubble colour identifies the survey module (German PPS or ECDC PPS)."),
+
           tags$li(tags$b("Bar plot:"),
-                  " Shows the burden by infection type, with separate bars for German PPS and ECDC PPS. ",
+                  "Shows the burden by infection type, with separate bars for German PPS and ECDC PPS. ",
                   "Error bars indicate the ", tags$b("95% uncertainty interval (UI)"),
                   " shown here as a placeholder ±10% around the estimate. ",
                   "Colours are fixed: German PPS = steelblue, ECDC PPS = coral."),
+
           tags$li(tags$b("Age pyramid:"),
-                  " Displays DALYs by age and sex. ",
-                  "Left = Female, Right = Male; bar represents total DALYs (weighted).")
+                  "Visualises the distribution of total DALYs across age and sex groups.",
+                  "Left = Female, Right = Male; bar represents total DALYs (weighted).",
+                  "This plot highlights demographic patterns—for example,
+                  whether burden is concentrated among older adults,
+                  or differs between sexes within infection types.")
         ),
         tags$hr(),
 
