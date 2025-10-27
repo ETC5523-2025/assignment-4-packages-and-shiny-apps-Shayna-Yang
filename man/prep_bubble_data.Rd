@@ -2,21 +2,23 @@
 % Please edit documentation in R/summarise_results.R
 \name{prep_bubble_data}
 \alias{prep_bubble_data}
-\title{Prepare bubble plot data (corresponding to Figure 2)}
+\title{Prepare data for the bubble plot (Figure 2)}
 \usage{
 prep_bubble_data(cases)
 }
 \arguments{
-\item{cases}{A data frame, typically \code{shayhai::shayhai_cases}.}
+\item{cases}{A simulated dataset such as \code{shayhai_cases}.}
 }
 \value{
-A tibble with columns:
-\code{infection_type}, \code{n_hai_est}, \code{deaths_est},
-and \code{dalys_est}.
+A tibble with columns \code{infection_type},
+\code{n_hai_est}, \code{deaths_est}, \code{dalys_est}.
 }
 \description{
-Generates a tidy data frame containing, for each infection type,
-the estimated annual number of infections, attributable deaths,
-and total DALYs. This dataset can be directly used to create
-a bubble plot similar to Figure 2 of the published study.
+Returns infections, deaths, and DALYs by infection type in a tidy
+format ready for plotting a bubble chart like Figure 2 of the paper:
+\itemize{
+\item x-axis: HAIs
+\item y-axis: attributable deaths
+\item bubble size: DALYs
+}
 }

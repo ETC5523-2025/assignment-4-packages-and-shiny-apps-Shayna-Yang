@@ -2,18 +2,20 @@
 % Please edit documentation in R/summarise_results.R
 \name{add_all_row}
 \alias{add_all_row}
-\title{Add a total "All" row}
+\title{Add a total "All" row to a burden summary}
 \usage{
 add_all_row(tbl)
 }
 \arguments{
-\item{tbl}{The output of \code{summarise_table1()}.}
+\item{tbl}{A tibble returned by \code{summarise_burden_totals()}.}
 }
 \value{
-A tibble identical to the input but with one additional
-row summarising all infection types.
+The same tibble with an extra "All" row.
 }
 \description{
-Appends a summary row where all infection types are combined
-into a single total, with \code{infection_type = "All"}.
+Takes the output of \code{summarise_burden_totals()} and appends a
+final row where all infection types are combined (\code{"All"}).
+}
+\details{
+This mirrors the "All" line shown in the paper.
 }

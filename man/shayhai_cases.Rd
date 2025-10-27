@@ -3,52 +3,57 @@
 \docType{data}
 \name{shayhai_cases}
 \alias{shayhai_cases}
-\title{Simulated case-level HAI burden data}
+\title{Simulated case-level HAI burden data (Germany)}
 \format{
-A tibble-like data frame with ~5,000 rows and 9 columns.
+A data frame (tibble) with 5,000 rows and 9 columns.
 }
 \source{
-Calibrated to published summary estimates (German PPS).
+Calibrated to published German PPS estimates.
 }
 \usage{
 shayhai_cases
 }
 \description{
-A synthetic microdata table where each row is a single
-healthcare-associated infection case. The dataset is calibrated
-so that weighted totals reproduce published estimates of annual
-infections, deaths, and DALYs for Germany (German PPS sample).
+The dataset \code{shayhai_cases} contains 5,000 simulated
+healthcare-associated infection (HAI) cases for Germany.
+Each row represents one synthetic patient record.
 }
 \details{
+Case weights are calibrated so that, when summed, they reproduce
+the published national estimates from the German PPS study (2011):
+total HAIs, attributable deaths, and DALYs.
+
 Columns:
 \describe{
 \item{case_id}{Unique simulated case ID.}
 \item{infection_type}{Type of HAI:
-\code{"HAP"} (pneumonia),
+\code{"HAP"} (healthcare-associated pneumonia),
 \code{"SSI"} (surgical site infection),
 \code{"BSI"} (primary bloodstream infection),
 \code{"UTI"} (urinary tract infection),
 \code{"CDI"} (\emph{Clostridioides difficile} infection).}
-\item{age_group}{Age band at infection (matching Figure 4 bins).}
-\item{sex}{Reported sex ("Female","Male").}
-\item{died}{1 if the case was estimated to result in attributable death,
-0 otherwise.}
-\item{yll}{Years of life lost (YLL) for this case.}
-\item{yld}{Years lived with disability (YLD) for this case.}
-\item{daly}{Total disability-adjusted life years (DALY = YLL + YLD).}
-\item{weight_pop}{How many real-world annual cases this simulated row
-stands for. Summing \code{weight_pop} across cases of a given infection
-type gives the estimated national total number of cases for that type.}
+\item{age_group}{Age band at infection, e.g. "65-74", "75-79", "80-84", "85+").}
+\item{sex}{Reported sex ("Female", "Male").}
+\item{died}{Indicator (1/0) for whether the infection was estimated
+to result in an attributable death.}
+\item{yll}{Years of life lost (YLL) assigned to this case.}
+\item{yld}{Years lived with disability (YLD) assigned to this case.}
+\item{daly}{Total disability-adjusted life years for this case
+(\code{daly = yll + yld}).}
+\item{weight_pop}{How many real-world cases this simulated row
+represents. Summing \code{weight_pop} across cases of a given
+\code{infection_type} yields the estimated annual number of HAIs
+of that type in Germany.}
 }
 
 Interpretation:
 \itemize{
-\item Summing \code{weight_pop * died} across rows approximates
-annual attributable deaths by infection type.
-\item Summing \code{weight_pop * daly} approximates total DALYs.
+\item \code{sum(weight_pop * died)} approximates the annual number of
+attributable deaths for each infection type in Germany.
+\item \code{sum(weight_pop * daly)} approximates the total DALYs
+for that infection type.
 }
 
-These totals match (to rounding) the values reported in the published
-German PPS study for 2011.
+These weighted totals reflect the German PPS study (2011).
 }
 \keyword{datasets}

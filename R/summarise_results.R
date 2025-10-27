@@ -1,23 +1,25 @@
-#' Summarise simulated cases to reproduce Table 1
+#' Summarise total burden by infection type
 #'
-#' Using the simulated dataset \code{shayhai_cases}, this function aggregates
-#' case-level values by infection type to estimate the total number of
-#' healthcare-associated infections (HAIs), attributable deaths,
-#' years of life lost (YLLs), years lived with disability (YLDs),
-#' and total disability-adjusted life years (DALYs).
+#' Aggregates a simulated case dataset (e.g. \code{shayhai_cases} or
+#' \code{shayhai_cases_ecdc}) to estimate total annual burden per
+#' infection type.
 #'
-#' This reproduces the style of Table 1 in the published study
-#' (German PPS sample, 2011).
+#' The output includes:
+#' \itemize{
+#'   \item total HAIs
+#'   \item attributable deaths
+#'   \item YLL (years of life lost)
+#'   \item YLD (years lived with disability)
+#'   \item DALYs (YLL + YLD)
+#' }
 #'
-#' @param cases A data frame, typically \code{shayhai::shayhai_cases}.
 #'
-#' @return A tibble where each row corresponds to one infection type,
-#' including the following columns:
-#' \code{n_hai_est}, \code{deaths_est}, \code{ylls_est},
-#' \code{ylds_est}, and \code{dalys_est}.
+#' @param cases A simulated dataset such as \code{shayhai_cases}
+#'   (Germany) or \code{shayhai_cases_ecdc} (EU/EEA).
 #'
+#' @return A tibble: one row per infection type.
 #' @export
-summarise_table <- function(cases) {
+summarise_burden_totals <- function(cases) {
   cases |>
     dplyr::group_by(infection_type) |>
     dplyr::summarise(
@@ -31,16 +33,15 @@ summarise_table <- function(cases) {
     dplyr::arrange(infection_type)
 }
 
-#' Add a total "All" row
+#' Add a total "All" row to a burden summary
 #'
-#' Appends a summary row where all infection types are combined
-#' into a single total, with \code{infection_type = "All"}.
+#' Takes the output of \code{summarise_burden_totals()} and appends a
+#' final row where all infection types are combined (\code{"All"}).
 #'
-#' @param tbl The output of \code{summarise_table1()}.
+#' This mirrors the "All" line shown in the paper.
 #'
-#' @return A tibble identical to the input but with one additional
-#' row summarising all infection types.
-#'
+#' @param tbl A tibble returned by \code{summarise_burden_totals()}.
+#' @return The same tibble with an extra "All" row.
 #' @export
 add_all_row <- function(tbl) {
   all_row <- tbl |>
@@ -55,26 +56,45 @@ add_all_row <- function(tbl) {
   dplyr::bind_rows(tbl, all_row)
 }
 
-#' Prepare bubble plot data (corresponding to Figure 2)
+#' Prepare data for the bubble plot (Figure 2)
 #'
-#' Generates a tidy data frame containing, for each infection type,
-#' the estimated annual number of infections, attributable deaths,
-#' and total DALYs. This dataset can be directly used to create
-#' a bubble plot similar to Figure 2 of the published study.
+#' Returns infections, deaths, and DALYs by infection type in a tidy
+#' format ready for plotting a bubble chart like Figure 2 of the paper:
+#' \itemize{
+#'   \item x-axis: HAIs
+#'   \item y-axis: attributable deaths
+#'   \item bubble size: DALYs
+#' }
 #'
-#' @param cases A data frame, typically \code{shayhai::shayhai_cases}.
-#'
-#' @return A tibble with columns:
-#' \code{infection_type}, \code{n_hai_est}, \code{deaths_est},
-#' and \code{dalys_est}.
-#'
+#' @param cases A simulated dataset such as \code{shayhai_cases}.
+#' @return A tibble with columns \code{infection_type},
+#'   \code{n_hai_est}, \code{deaths_est}, \code{dalys_est}.
 #' @export
 prep_bubble_data <- function(cases) {
-  summarise_table(cases) |>
+  summarise_burden_totals(cases) |>
     dplyr::select(
       infection_type,
       n_hai_est,
       deaths_est,
       dalys_est
     )
+}
+
+#' Choose which dataset to analyse (Germany vs EU/EEA)
+#'
+#' Convenience helper for the Shiny app. Returns either the German
+#' simulated dataset (\code{shayhai_cases}) or the EU/EEA simulated
+#' dataset (\code{shayhai_cases_ecdc}), depending on user input.
+#'
+#' @param sample Either \code{"Germany"} or \code{"EU/EEA"}.
+#'
+#' @return A data frame of simulated cases.
+#' @export
+choose_sample_cases <- function(sample = c("Germany", "EU/EEA")) {
+  sample <- match.arg(sample)
+  if (sample == "Germany") {
+    return(shayhai::shayhai_cases)
+  } else {
+    return(shayhai::shayhai_cases_ecdc)
+  }
 }
