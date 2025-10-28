@@ -22,3 +22,24 @@ format ready for plotting a bubble chart like Figure 2 of the paper:
 \item bubble size: DALYs
 }
 }
+\examples{
+# Prepare German PPS-style data for a bubble plot
+bubble_df <- prep_bubble_data(shayhai::shayhai_cases)
+bubble_df
+
+# You could then pass this to ggplot2, e.g.:
+# (not run during checks)
+\dontrun{
+  library(ggplot2)
+  ggplot(
+    bubble_df,
+    aes(x = n_hai_est,
+        y = deaths_est,
+        size = dalys_est,
+        label = infection_type)
+  ) +
+    geom_point(alpha = 0.6) +
+    geom_text(vjust = -0.7)
+}
+
+}

@@ -33,7 +33,7 @@ Columns:
 \item{infection_type}{Type of HAI:
 \code{"HAP"}, \code{"SSI"}, \code{"BSI"}, \code{"UTI"}, \code{"CDI"}.}
 \item{age_group}{Age band at infection.}
-\item{sex}{Reported sex ("Female", "Male").}
+\item{gender}{Reported gender ("Female", "Male").}
 \item{died}{Indicator (1/0) for attributable death.}
 \item{yll}{Years of life lost (YLL) for this case.}
 \item{yld}{Years lived with disability (YLD) for this case.}

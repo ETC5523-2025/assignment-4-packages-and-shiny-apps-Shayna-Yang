@@ -85,7 +85,7 @@ targets_ecdc <- targets_ecdc_rates |>
 
 
 # 3. Shared demographic sampling assumptions
-#    (age/sex distributions, same for both populations for now)
+#    (age/gender distributions, same for both populations for now)
 
 age_groups_ref <- c(
   "0-1","2-4","5-9","10-14","15-19","20-24","25-34","35-44",
@@ -95,8 +95,8 @@ age_groups_ref <- c(
 # Heavier weights in older ages, reflecting higher DALY burden in the figures
 age_weights_ref <- c(1,1,1,1,1,2,3,4,6,8,10,12,12,12)
 
-sex_levels_ref <- c("Female","Male")
-sex_weights_ref <- c(1,1)
+gender_levels_ref <- c("Female","Male")
+gender_weights_ref <- c(1,1)
 
 
 # 4. Generic simulator
@@ -107,8 +107,8 @@ simulate_cases_generic <- function(
     seed = 5523,
     age_groups = age_groups_ref,
     age_weights = age_weights_ref,
-    sex_levels = sex_levels_ref,
-    sex_weights = sex_weights_ref
+    gender_levels = gender_levels_ref,
+    gender_weights = gender_weights_ref
 ) {
   set.seed(seed)
 
@@ -125,15 +125,15 @@ simulate_cases_generic <- function(
     age_groups, size = n_cases, replace = TRUE, prob = age_weights
   )
 
-  sex_draw <- base::sample(
-    sex_levels, size = n_cases, replace = TRUE, prob = sex_weights
+  gender_draw <- base::sample(
+    gender_levels, size = n_cases, replace = TRUE, prob = gender_weights
   )
 
   df <- tibble::tibble(
     case_id = seq_len(n_cases),
     infection_type = infection_draw,
     age_group = age_draw,
-    sex = sex_draw
+    gender = gender_draw
   ) |>
     dplyr::left_join(targets_tbl, by = "infection_type") |>
     dplyr::rowwise() |>
@@ -159,7 +159,7 @@ simulate_cases_generic <- function(
       case_id,
       infection_type,
       age_group,
-      sex,
+      gender,
       died,
       yll,
       yld,

@@ -33,7 +33,7 @@ Columns:
 \code{"UTI"} (urinary tract infection),
 \code{"CDI"} (\emph{Clostridioides difficile} infection).}
 \item{age_group}{Age band at infection, e.g. "65-74", "75-79", "80-84", "85+").}
-\item{sex}{Reported sex ("Female", "Male").}
+\item{gender}{Reported gender ("Female", "Male").}
 \item{died}{Indicator (1/0) for whether the infection was estimated
 to result in an attributable death.}
 \item{yll}{Years of life lost (YLL) assigned to this case.}

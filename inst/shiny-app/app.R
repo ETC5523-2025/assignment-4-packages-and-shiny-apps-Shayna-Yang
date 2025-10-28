@@ -6,6 +6,7 @@ library(ggplot2)
 library(tidyr)
 library(bslib)
 library(plotly)
+library(DT)
 
 # 1. Data from package
 
@@ -22,11 +23,11 @@ all_cases <- bind_rows(shayhai_cases, shayhai_cases_ecdc)
 
 infection_choices <- c("HAP", "SSI", "BSI", "UTI", "CDI")
 module_choices <- c("German PPS", "ECDC PPS")
-sex_choices <- c("Female", "Male")
+gender_choices <- c("Female", "Male")
 age_choices <- c(
-  "0-1","2-4","5-9","10-14","15-19","20-24",
-  "25-34","35-44","45-54","55-64",
-  "65-74","75-79","80-84","85+"
+  "85+","80-84","75-79","65-74",
+  "55-64","45-54","35-44","25-34",
+  "20-24","15-19","10-14","5-9","2-4","0-1"
 )
 
 # UI
@@ -132,9 +133,9 @@ ui <- navbarPage(
         ),
 
 
-        checkboxGroupInput("sex_pyr", "Sex",
-                           choices  = sex_choices,
-                           selected = sex_choices
+        checkboxGroupInput("gender_pyr", "gender",
+                           choices  = gender_choices,
+                           selected = gender_choices
         ),
 
         checkboxGroupInput("age_group_pyr", "Age group(s)",
@@ -145,7 +146,7 @@ ui <- navbarPage(
       mainPanel(
         width = 9,
         div(class = "card-box",
-            h4("Age pyramid: Weighted DALYs by sex and age group"),
+            h4("Age pyramid: Weighted DALYs by gender and age group"),
             plotlyOutput("pyramid_plot", height = "500px"),
             tags$small(
               "Left = Female, Right = Male; Width = total DALYs. ",
@@ -185,7 +186,7 @@ ui <- navbarPage(
 
         h4("Purpose"),
         p("The goal is to help users explore differences in HAI burden across infection types, ",
-          "survey modules (German vs EU/EEA), and demographic subgroups (age, sex)."),
+          "survey modules (German vs EU/EEA), and demographic subgroups (age, gender)."),
         tags$hr(),
 
         h4("Field glossary"),
@@ -206,7 +207,7 @@ ui <- navbarPage(
         tags$ul(
           tags$li(tags$code("infection_type"), " – infection category (HAP, SSI, BSI, UTI, CDI)"),
           tags$li(tags$code("module"), " – data source (German PPS, ECDC PPS)"),
-          tags$li(tags$code("sex"), " – Male or Female"),
+          tags$li(tags$code("gender"), " – Male or Female"),
           tags$li(tags$code("age_group"), " – 14 age bands from 0–1 up to 85+"),
           tags$li(tags$code("died"), " – 1 if the simulated case resulted in death, else 0"),
           tags$li(tags$code("yll"), " – years of life lost for that case"),
@@ -234,11 +235,11 @@ ui <- navbarPage(
                   "Colours are fixed: German PPS = steelblue, ECDC PPS = coral."),
 
           tags$li(tags$b("Age pyramid:"),
-                  "Visualises the distribution of total DALYs across age and sex groups.",
+                  "Visualises the distribution of total DALYs across age and gender groups.",
                   "Left = Female, Right = Male; bar represents total DALYs (weighted).",
                   "This plot highlights demographic patterns—for example,
                   whether burden is concentrated among older adults,
-                  or differs between sexes within infection types.")
+                  or differs between genderes within infection types.")
         ),
         tags$hr(),
 
@@ -269,14 +270,14 @@ server <- function(input, output, session) {
   filter_cases <- function(
     infection = infection_choices,
     module    = module_choices,
-    sex       = sex_choices,
+    gender       = gender_choices,
     age       = age_choices
   ) {
     all_cases |>
       filter(
         infection_type %in% infection,
         module         %in% module,
-        sex            %in% sex,
+        gender            %in% gender,
         age_group      %in% age
       )
   }
@@ -286,7 +287,7 @@ server <- function(input, output, session) {
     df <- filter_cases(
       infection = input$infection_type,
       module    = module_choices,
-      sex       = sex_choices,
+      gender       = gender_choices,
       age       = age_choices
     ) |>
       group_by(infection_type, module) |>
@@ -327,7 +328,8 @@ server <- function(input, output, session) {
         size  = "DALYs (weighted)",
         color = "Survey module"
       ) +
-      theme_minimal()
+      theme_minimal() +
+      scale_y_continuous(expand = c(0.5, 1))
 
     ggplotly(p, tooltip = "text")
   })
@@ -442,9 +444,9 @@ server <- function(input, output, session) {
 
   # Age Pyramid
   output$pyramid_plot <- renderPlotly({
-    # empty sex filter empty plot
+    # empty gender filter empty plot
     validate(
-      need(length(input$sex_pyr) > 0, "No data for current filter.")
+      need(length(input$gender_pyr) > 0, "No data for current filter.")
     )
     # age level
     age_levels_desc <- rev(age_choices)  # "85+" ... "0-1"
@@ -453,7 +455,7 @@ server <- function(input, output, session) {
     df_raw <- all_cases |>
       filter(
         infection_type %in% input$infection_type_pyr,
-        sex            %in% input$sex_pyr,
+        gender            %in% input$gender_pyr,
         age_group      %in% input$age_group_pyr
       )
 
@@ -462,17 +464,17 @@ server <- function(input, output, session) {
     )
 
     df <- df_raw |>
-      group_by(age_group, sex) |>
+      group_by(age_group, gender) |>
       summarise(
         daly_weighted = sum(weight_pop * daly, na.rm = TRUE),
         .groups = "drop"
       ) |>
       mutate(
-        sex = tolower(sex),
+        gender = tolower(gender),
         age_group = factor(age_group, levels = age_levels_desc_filtered)
       ) |>
       tidyr::pivot_wider(
-        names_from  = sex,              # "female", "male"
+        names_from  = gender,              # "female", "male"
         values_from = daly_weighted,
         values_fill = 0
       )
@@ -497,7 +499,7 @@ server <- function(input, output, session) {
           y = -female,
           text = paste(
             "Age:", age_group,
-            "<br>Sex: Female",
+            "<br>gender: Female",
             "<br>DALYs:", round(female)
           )
         ),
@@ -511,7 +513,7 @@ server <- function(input, output, session) {
           y = male,
           text = paste(
             "Age:", age_group,
-            "<br>Sex: Male",
+            "<br>gender: Male",
             "<br>DALYs:", round(male)
           )
         ),
@@ -544,7 +546,7 @@ server <- function(input, output, session) {
     df_filt <- filter_cases(
       infection = infection_choices,
       module    = module_choices,
-      sex       = sex_choices,
+      gender       = gender_choices,
       age       = age_choices
     )
     validate(need(nrow(df_filt) > 0, "No data for current filter."))
@@ -616,7 +618,7 @@ server <- function(input, output, session) {
 
     table_wide <- blocks |>
       select(measure, module, infection_type, formatted) |>
-      tidyr::pivot_wider(
+      pivot_wider(
         names_from  = infection_type,
         values_from = formatted
       ) |>
@@ -634,7 +636,7 @@ server <- function(input, output, session) {
         Sample = module
       )
 
-    DT::datatable(
+    datatable(
       table_wide,
       rownames = FALSE,
       options = list(

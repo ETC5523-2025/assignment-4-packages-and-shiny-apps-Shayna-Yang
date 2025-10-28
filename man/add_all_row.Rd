@@ -19,3 +19,11 @@ final row where all infection types are combined (\code{"All"}).
 \details{
 This mirrors the "All" line shown in the paper.
 }
+\examples{
+# Start with per-infection-type totals
+burden_tbl <- summarise_burden_totals(shayhai::shayhai_cases)
+
+# Add an overall "All" row
+add_all_row(burden_tbl)
+
+}

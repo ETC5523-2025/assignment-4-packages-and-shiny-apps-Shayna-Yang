@@ -17,3 +17,14 @@ Convenience helper for the Shiny app. Returns either the German
 simulated dataset (\code{shayhai_cases}) or the EU/EEA simulated
 dataset (\code{shayhai_cases_ecdc}), depending on user input.
 }
+\examples{
+# Get the German PPS-like dataset
+choose_sample_cases("Germany")
+
+# Get the EU/EEA PPS-like dataset
+choose_sample_cases("EU/EEA")
+
+# If you don't supply an argument, it will default to "Germany":
+choose_sample_cases()
+
+}

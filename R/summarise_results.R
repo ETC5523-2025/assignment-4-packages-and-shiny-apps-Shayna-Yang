@@ -41,7 +41,16 @@ summarise_burden_totals <- function(cases) {
 #' This mirrors the "All" line shown in the paper.
 #'
 #' @param tbl A tibble returned by \code{summarise_burden_totals()}.
+#'
 #' @return The same tibble with an extra "All" row.
+#'
+#' @examples
+#' # Start with per-infection-type totals
+#' burden_tbl <- summarise_burden_totals(shayhai::shayhai_cases)
+#'
+#' # Add an overall "All" row
+#' add_all_row(burden_tbl)
+#'
 #' @export
 add_all_row <- function(tbl) {
   all_row <- tbl |>
@@ -69,6 +78,26 @@ add_all_row <- function(tbl) {
 #' @param cases A simulated dataset such as \code{shayhai_cases}.
 #' @return A tibble with columns \code{infection_type},
 #'   \code{n_hai_est}, \code{deaths_est}, \code{dalys_est}.
+#' @examples
+#' # Prepare German PPS-style data for a bubble plot
+#' bubble_df <- prep_bubble_data(shayhai::shayhai_cases)
+#' bubble_df
+#'
+#' # You could then pass this to ggplot2, e.g.:
+#' # (not run during checks)
+#' \dontrun{
+#'   library(ggplot2)
+#'   ggplot(
+#'     bubble_df,
+#'     aes(x = n_hai_est,
+#'         y = deaths_est,
+#'         size = dalys_est,
+#'         label = infection_type)
+#'   ) +
+#'     geom_point(alpha = 0.6) +
+#'     geom_text(vjust = -0.7)
+#' }
+#'
 #' @export
 prep_bubble_data <- function(cases) {
   summarise_burden_totals(cases) |>
@@ -89,6 +118,17 @@ prep_bubble_data <- function(cases) {
 #' @param sample Either \code{"Germany"} or \code{"EU/EEA"}.
 #'
 #' @return A data frame of simulated cases.
+#'
+#' @examples
+#' # Get the German PPS-like dataset
+#' choose_sample_cases("Germany")
+#'
+#' # Get the EU/EEA PPS-like dataset
+#' choose_sample_cases("EU/EEA")
+#'
+#' # If you don't supply an argument, it will default to "Germany":
+#' choose_sample_cases()
+#'
 #' @export
 choose_sample_cases <- function(sample = c("Germany", "EU/EEA")) {
   sample <- match.arg(sample)

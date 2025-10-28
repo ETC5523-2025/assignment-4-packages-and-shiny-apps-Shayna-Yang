@@ -1,4 +1,12 @@
-url: ~
+url: "https://github.com/ETC5523-2025/assignment-4-packages-and-shiny-apps-Shayna-Yang"
+
 template:
   bootstrap: 5
-
+home:
+  title: "shayhai"
+  description: "A teaching-focused R package for exploring the burden of healthcare-associated infections (HAIs)."
+  links:
+    - text: "View vignette"
+      href: articles/shayhai.html
+    - text: "GitHub"
+      href: https://github.com/ETC5523-2025/assignment-4-packages-and-shiny-apps-Shayna-Yang
