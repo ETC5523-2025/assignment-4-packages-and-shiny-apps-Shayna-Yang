@@ -58,21 +58,8 @@ ui <- navbarPage(
         h4("Filters"),
         checkboxGroupInput("infection_type", "Infection type(s)",
                            choices  = infection_choices,
-                           selected = infection_choices),
-
-        checkboxGroupInput("module", "Survey module(s)",
-                           choices  = module_choices,
-                           selected = module_choices),
-
-        checkboxGroupInput("sex", "Sex",
-                           choices  = sex_choices,
-                           selected = sex_choices),
-
-        checkboxGroupInput("age_group", "Age group(s)",
-                           choices  = age_choices,
-                           selected = age_choices),
-        tags$hr(),
-
+                           selected = infection_choices
+        )
       ),
       mainPanel(
         width = 9,
@@ -97,28 +84,26 @@ ui <- navbarPage(
         width = 3,
         h4("Filters"),
 
-        checkboxGroupInput("infection_type_bar", "Infection type(s)",
-                           choices  = infection_choices,
-                           selected = infection_choices),
+        checkboxGroupInput(
+          "infection_type_bar", "Infection type(s)",
+          choices  = infection_choices,
+          selected = infection_choices
+        ),
 
-        checkboxGroupInput("module_bar", "Survey module(s)",
-                           choices  = module_choices,
-                           selected = module_choices),
-
-        checkboxGroupInput("sex_bar", "Sex",
-                           choices  = sex_choices,
-                           selected = sex_choices),
-
-        checkboxGroupInput("age_group_bar", "Age group(s)",
-                           choices  = age_choices,
-                           selected = age_choices),
+        checkboxGroupInput(
+          "module_bar", "Survey module(s)",
+          choices  = module_choices,
+          selected = module_choices
+        ),
 
         tags$hr(),
         radioButtons(
           "metric_bar",
           "Choose metric:",
-          choices = c("Attributable deaths per 100,000" = "deaths",
-                      "DALYs per 100,000"               = "dalys"),
+          choices = c(
+            "Attributable deaths per 100,000" = "deaths",
+            "DALYs per 100,000"               = "dalys"
+          ),
           selected = "deaths"
         )
       ),
@@ -140,21 +125,22 @@ ui <- navbarPage(
       sidebarPanel(
         width = 3,
         h4("Filters"),
+
         checkboxGroupInput("infection_type_pyr", "Infection type(s)",
                            choices  = infection_choices,
-                           selected = infection_choices),
+                           selected = infection_choices
+        ),
 
-        checkboxGroupInput("module_pyr", "Survey module(s)",
-                           choices  = module_choices,
-                           selected = module_choices),
 
         checkboxGroupInput("sex_pyr", "Sex",
                            choices  = sex_choices,
-                           selected = sex_choices),
+                           selected = sex_choices
+        ),
 
         checkboxGroupInput("age_group_pyr", "Age group(s)",
                            choices  = age_choices,
-                           selected = age_choices),
+                           selected = age_choices
+        )
       ),
       mainPanel(
         width = 9,
@@ -163,7 +149,7 @@ ui <- navbarPage(
             plotlyOutput("pyramid_plot", height = "500px"),
             tags$small(
               "Left = Female, Right = Male; Width = total DALYs. ",
-              "Use filters to focus on a specific infection or module."
+              "Use filters to focus on a specific infection or demographic group."
             )
         )
       )
@@ -280,19 +266,29 @@ ui <- navbarPage(
 # Server
 server <- function(input, output, session) {
 
-  filter_cases <- function(infection, module, sex, age) {
+  filter_cases <- function(
+    infection = infection_choices,
+    module    = module_choices,
+    sex       = sex_choices,
+    age       = age_choices
+  ) {
     all_cases |>
       filter(
         infection_type %in% infection,
-        module %in% module,
-        sex %in% sex,
-        age_group %in% age
+        module         %in% module,
+        sex            %in% sex,
+        age_group      %in% age
       )
   }
 
   # Bubble
   output$bubble_plot <- renderPlotly({
-    df <- filter_cases(input$infection_type, input$module, input$sex, input$age_group) |>
+    df <- filter_cases(
+      infection = input$infection_type,
+      module    = module_choices,
+      sex       = sex_choices,
+      age       = age_choices
+    ) |>
       group_by(infection_type, module) |>
       summarise(
         cases_est  = sum(weight_pop, na.rm = TRUE),
@@ -300,39 +296,49 @@ server <- function(input, output, session) {
         dalys_est  = sum(weight_pop * daly, na.rm = TRUE),
         .groups = "drop"
       )
+
     validate(need(nrow(df) > 0, "No data for current filter."))
 
-    p <- ggplot(df, aes(x = cases_est, y = deaths_est,
-                        size = dalys_est, color = module,
-                        text = paste(
-                          "Infection:", infection_type,
-                          "<br>Module:", module,
-                          "<br>Cases:", round(cases_est),
-                          "<br>Deaths:", round(deaths_est),
-                          "<br>DALYs:", round(dalys_est)
-                        ))) +
+    p <- ggplot(
+      df,
+      aes(
+        x = cases_est,
+        y = deaths_est,
+        size  = dalys_est,
+        color = module,
+        text = paste(
+          "Infection:", infection_type,
+          "<br>Module:", module,
+          "<br>Cases:", round(cases_est),
+          "<br>Deaths:", round(deaths_est),
+          "<br>DALYs:", round(dalys_est)
+        )
+      )
+    ) +
       geom_point(alpha = 0.6) +
       geom_text(aes(label = infection_type), vjust = -0.7, size = 3) +
       scale_size_area(max_size = 20) +
       scale_color_manual(
         values = c("German PPS" = "steelblue", "ECDC PPS" = "coral")
       ) +
-      labs(x = "Number of HAIs (weighted)",
-           y = "Attributable deaths (weighted)",
-           size = "DALYs (weighted)",
-           color = "Survey module") +
+      labs(
+        x = "Number of HAIs (weighted)",
+        y = "Attributable deaths (weighted)",
+        size  = "DALYs (weighted)",
+        color = "Survey module"
+      ) +
       theme_minimal()
+
     ggplotly(p, tooltip = "text")
   })
 
   # Bar plot
   output$bar_plot <- renderPlotly({
-    df <- filter_cases(
-      infection = input$infection_type_bar,
-      module    = input$module_bar,
-      sex       = input$sex_bar,
-      age       = input$age_group_bar
-    ) |>
+    df <- all_cases |>
+      filter(
+        infection_type %in% input$infection_type_bar,
+        module         %in% input$module_bar
+      ) |>
       group_by(infection_type, module) |>
       summarise(
         deaths_est = sum(weight_pop * died, na.rm = TRUE),
@@ -340,20 +346,12 @@ server <- function(input, output, session) {
         .groups = "drop"
       ) |>
       mutate(
-        # 95% UI placeholder (±10%)
         ui_low_death  = deaths_est * 0.9,
         ui_high_death = deaths_est * 1.1,
         ui_low_daly   = dalys_est * 0.9,
         ui_high_daly  = dalys_est * 1.1,
-
-        infection_type = factor(
-          infection_type,
-          levels = c("HAP","SSI","BSI","UTI","CDI")
-        ),
-        module = factor(
-          module,
-          levels = c("German PPS","ECDC PPS")
-        )
+        infection_type = factor(infection_type, levels = infection_choices),
+        module         = factor(module,         levels = module_choices)
       )
 
     validate(need(nrow(df) > 0, "No data for current filter."))
@@ -386,21 +384,20 @@ server <- function(input, output, session) {
           width = 0.2
         ) +
         scale_fill_manual(
-          values = c("German PPS" = "steelblue",
-                     "ECDC PPS"   = "coral"),
+          values = c("German PPS" = "steelblue", "ECDC PPS" = "coral"),
           name = "Survey module"
         ) +
         labs(
-          x   = "Infection type",
-          y   = "Attributable deaths (weighted)"
+          x = "Infection type",
+          y = "Attributable deaths (weighted)"
         ) +
         theme_minimal() +
         theme(
-          panel.grid.minor = element_blank(),
+          panel.grid.minor   = element_blank(),
           panel.grid.major.y = element_line(color = "grey90")
         )
 
-    } else { # metric == "dalys"
+    } else { # DALYs
       p <- ggplot(
         df,
         aes(
@@ -426,55 +423,108 @@ server <- function(input, output, session) {
           width = 0.2
         ) +
         scale_fill_manual(
-          values = c("German PPS" = "steelblue",
-                     "ECDC PPS"   = "coral"),
+          values = c("German PPS" = "steelblue", "ECDC PPS" = "coral"),
           name = "Survey module"
         ) +
         labs(
-          x   = "Infection type",
-          y   = "DALYs (weighted)"
+          x = "Infection type",
+          y = "DALYs (weighted)"
         ) +
         theme_minimal() +
         theme(
-          panel.grid.minor = element_blank(),
+          panel.grid.minor   = element_blank(),
           panel.grid.major.y = element_line(color = "grey90")
         )
     }
 
     ggplotly(p, tooltip = "text")
   })
+
   # Age Pyramid
   output$pyramid_plot <- renderPlotly({
-    df <- filter_cases(input$infection_type_pyr, input$module_pyr,
-                       input$sex_pyr, input$age_group_pyr) |>
+    # empty sex filter empty plot
+    validate(
+      need(length(input$sex_pyr) > 0, "No data for current filter.")
+    )
+    # age level
+    age_levels_desc <- rev(age_choices)  # "85+" ... "0-1"
+    age_levels_desc_filtered <- age_levels_desc[age_levels_desc %in% input$age_group_pyr]
+
+    df_raw <- all_cases |>
+      filter(
+        infection_type %in% input$infection_type_pyr,
+        sex            %in% input$sex_pyr,
+        age_group      %in% input$age_group_pyr
+      )
+
+    validate(
+      need(nrow(df_raw) > 0, "No data for current filter.")
+    )
+
+    df <- df_raw |>
       group_by(age_group, sex) |>
       summarise(
         daly_weighted = sum(weight_pop * daly, na.rm = TRUE),
         .groups = "drop"
       ) |>
-      mutate(sex = tolower(sex)) |>
-      pivot_wider(names_from = sex, values_from = daly_weighted, values_fill = 0) |>
       mutate(
-        female = ifelse(is.na(female), 0, female),
-        male   = ifelse(is.na(male),   0, male)
+        sex = tolower(sex),
+        age_group = factor(age_group, levels = age_levels_desc_filtered)
       ) |>
+      tidyr::pivot_wider(
+        names_from  = sex,              # "female", "male"
+        values_from = daly_weighted,
+        values_fill = 0
+      )
+
+    # make sure the coulumn exist if user choose only one
+    if (!"female" %in% names(df)) df$female <- 0
+    if (!"male"   %in% names(df)) df$male   <- 0
+
+    df <- df |>
       arrange(age_group)
-    validate(need(nrow(df) > 0, "No data for current filter."))
+
+    # if all 0 then stop
+    validate(
+      need(sum(df$female) + sum(df$male) > 0, "No data for current filter.")
+    )
 
     p <- ggplot() +
-      geom_col(data = df, aes(x = age_group, y = -female,
-                              text = paste("Age:", age_group,
-                                           "<br>Sex: Female",
-                                           "<br>DALYs:", round(female))),
-               alpha = 1, fill = "coral") +
-      geom_col(data = df, aes(x = age_group, y = male,
-                              text = paste("Age:", age_group,
-                                           "<br>Sex: Male",
-                                           "<br>DALYs:", round(male))),
-               alpha = 1, fill = "steelblue") +
+      geom_col(
+        data = df,
+        aes(
+          x = age_group,
+          y = -female,
+          text = paste(
+            "Age:", age_group,
+            "<br>Sex: Female",
+            "<br>DALYs:", round(female)
+          )
+        ),
+        alpha = 1,
+        fill = "coral"
+      ) +
+      geom_col(
+        data = df,
+        aes(
+          x = age_group,
+          y = male,
+          text = paste(
+            "Age:", age_group,
+            "<br>Sex: Male",
+            "<br>DALYs:", round(male)
+          )
+        ),
+        alpha = 1,
+        fill = "steelblue"
+      ) +
       coord_flip() +
-      labs(x = "Age group", y = "DALYs (weighted)") +
+      labs(
+        x = "Age group",
+        y = "DALYs (weighted)"
+      ) +
       theme_minimal()
+
     ggplotly(p, tooltip = "text")
   })
 
@@ -492,10 +542,10 @@ server <- function(input, output, session) {
   # table
   output$summary_table <- DT::renderDataTable({
     df_filt <- filter_cases(
-      infection = input$infection_type,
-      module    = input$module,
-      sex       = input$sex,
-      age       = input$age_group
+      infection = infection_choices,
+      module    = module_choices,
+      sex       = sex_choices,
+      age       = age_choices
     )
     validate(need(nrow(df_filt) > 0, "No data for current filter."))
 
