@@ -118,20 +118,7 @@ germany_summary
 
 Below is a simple bar plot based on the German PPS totals.
 
-```{r fig.alt="Bar plot showing estimated annual HAIs by infection type in the German PPS sample"}
-germany_summary |>
-  ggplot(aes(x = infection_type, y = n_hai_est, fill = infection_type)) +
-  geom_col() +
-  theme_minimal(base_size = 12) +
-  theme(
-    legend.position = "none",
-    axis.title.x = element_blank(),
-    axis.text.x = element_text(face = "bold"),
-    plot.title = element_text(face = "bold")) +
-  labs(
-    title = "Estimated annual HAIs by infection type (German PPS)",
-    y = "Estimated HAIs")
-```
+![Bar plot showing estimated annual HAIs by infection type in the German PPS sample](../man/figures/quick_visual.png)
 
 This is the kind of figure you could drop into a report to communicate “which infection types matter most”.
 

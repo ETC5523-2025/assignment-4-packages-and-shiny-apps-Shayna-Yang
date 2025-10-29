@@ -2,33 +2,34 @@ url: https://ETC5523-2025.github.io/assignment-4-packages-and-shiny-apps-Shayna-
 
 template:
   bootstrap: 5
-  assets:
-    - inst/pkgdown/extra.css
+  light-switch: true
 
 navbar:
-  structure:
-    left: [reference, articles]
-    right: [github, search]
-  components:
-    reference:
-      text: "Reference"
-      href: reference/index.html
-    examples:
-      text: "Examples"
+  title: "shayhai"
+  left:
+    - text: "Get started"
       href: articles/shayhai.html
-    github:
-      icon: fab fa-github
-      href: https://github.com/Shayna-Yang
+    - text: "Examples"
+      href: articles/shayhai.html   # you only have one vignette now; keep same link
+    - text: "Reference"
+      href: reference/index.html
+  right:
+    - icon: fab fa-github
+      href: https://github.com/ETC5523-2025/assignment-4-packages-and-shiny-apps-Shayna-Yang
       aria-label: "GitHub repository"
+    - search: true
 
 home:
   title: "shayhai"
   description: "A teaching-focused R package for exploring the burden of healthcare-associated infections (HAIs)."
   links:
-    - text: "View vignette"
+    - text: "Open the Shiny app"
+      href: reference/index.html#run_app
+    - text: "Get started"
       href: articles/shayhai.html
     - text: "GitHub"
       href: https://github.com/ETC5523-2025/assignment-4-packages-and-shiny-apps-Shayna-Yang
+
 
 reference:
   - title: "Shiny app"
@@ -48,6 +49,6 @@ reference:
       - summarise_burden_totals
 
 articles:
-  - title: "Examples"
+  - title: "Get started"
     contents:
       - shayhai
