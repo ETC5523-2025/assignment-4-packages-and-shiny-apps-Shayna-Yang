@@ -107,7 +107,9 @@ germany_summary
 
 Below is a simple bar plot based on the German PPS totals.
 
-![Bar plot showing estimated annual HAIs by infection type in the German PPS sample](../man/figures/quick_visual.png)
+```{r quick-bar-plot-image, echo=FALSE, out.width='70%'}
+knitr::include_graphics("../man/figures/quick_visual.png")
+```
 
 This is the kind of figure you could drop into a report to communicate “which infection types matter most”.
 
