@@ -34,11 +34,11 @@ pak::pak("ETC5523-2025/assignment-4-packages-and-shiny-apps-Shayna-Yang")
 ```
 Load the package:
 
-```{r}
-library(shayhai)
-```
+  ```{r}
+  library(shayhai)
+  ```
 
-## Data Included
+### Data Included
 
 The package ships with two small simulated datasets:
 
@@ -61,7 +61,7 @@ Example preview:
 head(shayhai_cases)
 ```
 
-## Shiny App
+### Shiny App
 
 The package includes an interactive dashboard to explore infection burden by type, survey module, and demographic group.
 
@@ -73,11 +73,7 @@ App features:
 
 - Age pyramid: DALYs by sex and age group
 
-Launch the app:
-
-```{r}
-shayhai::run_app()
-```
+You can explore the interactive [Shiny app](https://etc5523-2025.github.io/assignment-4-packages-and-shiny-apps-Shayna-Yang/articles/Examples.html) included in the package.
 
 ## Data Sources
 

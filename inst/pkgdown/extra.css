@@ -1,0 +1,42 @@
+/* css styles */
+.navbar {
+  padding-top: 0.3rem !important;
+  padding-bottom: 0.3rem !important;
+  min-height: 48px !important;
+  background-color: #415a77 !important;
+  color: #e0e1dd !important;
+}
+
+.navbar-brand {
+  color: #e0e1dd !important;
+}
+
+.navbar-brand:hover,
+.navbar-brand:focus {
+  color: #AEC3B0 !important;
+  text-decoration: none !important;
+}
+
+body {
+  background-color: #e0e1dd;
+  color: #01161E;
+  font-family: 'PT Sans', sans-serif;
+}
+
+#quarto-appendix.default {
+  background-color: #e0e1dd !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 1rem 0 !important;
+  margin-top: 2rem !important;
+}
+
+img, figure {
+  border: none !important;
+  border-radius: 6px;
+}
+
+img:not(figure img) {
+  border: 3px solid #AEC3B0;
+  border-radius: 6px;
+}

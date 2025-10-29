@@ -2,18 +2,6 @@ url: "https://github.com/ETC5523-2025/assignment-4-packages-and-shiny-apps-Shayn
 
 template:
   bootstrap: 5
-  bslib:
-    primary: "#415a77"
-    secondary: "#AEC3B0"
-    base_font: "PT Sans"
-    bg: "#e0e1dd"
-    fg: "#01161E"
-    headings-color: "#415a77"
-    navbar-bg: "#415a77"
-    navbar-fg: "#e0e1dd"
-    navbar-hl: "#AEC3B0"
-    link-color: "#415a77"
-    border-color: "#AEC3B0"
 
 navbar:
   structure:
@@ -58,6 +46,6 @@ reference:
       - summarise_burden_totals
 
 articles:
-  - title: "Package"
+  - title: "Example"
     contents:
       - shayhai

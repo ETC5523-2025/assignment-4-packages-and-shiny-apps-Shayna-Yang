@@ -46,7 +46,7 @@ pak::pak("ETC5523-2025/assignment-4-packages-and-shiny-apps-Shayna-Yang")
 
 Load the package:
 
-```{r setup}
+```{r}
 library(shayhai)
 ```
 
