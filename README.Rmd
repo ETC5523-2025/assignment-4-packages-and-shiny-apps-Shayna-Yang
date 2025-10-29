@@ -75,17 +75,17 @@ App features:
 
 You can explore the interactive [Shiny app](https://etc5523-2025.github.io/assignment-4-packages-and-shiny-apps-Shayna-Yang/articles/shayhai.html#using-the-shiny-app) included in the package.
 
-<p align="center">
+<div style="display: flex; justify-content: center; align-items: flex-start; gap: 1rem; flex-wrap: wrap; margin: 1rem 0;">
   <a href="https://etc5523-2025.github.io/assignment-4-packages-and-shiny-apps-Shayna-Yang/articles/shayhai.html#bubble-plot-dalys-vs-deaths-vs-cases">
-    <img src="https://raw.githubusercontent.com/ETC5523-2025/assignment-4-packages-and-shiny-apps-Shayna-Yang/main/man/figures/bubble_example.png" width="30%" alt="Bubble plot example"></img>
+    <img src="https://raw.githubusercontent.com/ETC5523-2025/assignment-4-packages-and-shiny-apps-Shayna-Yang/main/man/figures/bubble_example.png" width="30%" style="border:3px solid #AEC3B0; border-radius:6px;">
   </a>
   <a href="https://etc5523-2025.github.io/assignment-4-packages-and-shiny-apps-Shayna-Yang/articles/shayhai.html#bar-plot-with-95-ui">
-    <img src="https://raw.githubusercontent.com/ETC5523-2025/assignment-4-packages-and-shiny-apps-Shayna-Yang/main/man/figures/bar_example.png" width="30%" alt="Bar plot example"></img>
+    <img src="https://raw.githubusercontent.com/ETC5523-2025/assignment-4-packages-and-shiny-apps-Shayna-Yang/main/man/figures/bar_example.png" width="30%" style="border:3px solid #AEC3B0; border-radius:6px;">
   </a>
   <a href="https://etc5523-2025.github.io/assignment-4-packages-and-shiny-apps-Shayna-Yang/articles/shayhai.html#age-pyramid-weighted-dalys-by-gender-and-age-group">
-    <img src="https://raw.githubusercontent.com/ETC5523-2025/assignment-4-packages-and-shiny-apps-Shayna-Yang/main/man/figures/agepyramid_example.png" width="30%" alt="Age pyramid example"></img>
+    <img src="https://raw.githubusercontent.com/ETC5523-2025/assignment-4-packages-and-shiny-apps-Shayna-Yang/main/man/figures/agepyramid_example.png" width="30%" style="border:3px solid #AEC3B0; border-radius:6px;">
   </a>
-</p>
+</div>
 
 ## Data Sources
 
