@@ -7,8 +7,6 @@ template:
 navbar:
   title: "shayhai"
   left:
-    - text: "Get started"
-      href: articles/shayhai.html
     - text: "Examples"
       href: articles/shayhai.html   # you only have one vignette now; keep same link
     - text: "Reference"
@@ -49,6 +47,6 @@ reference:
       - summarise_burden_totals
 
 articles:
-  - title: "Get started"
+  - title: "Examples"
     contents:
       - shayhai
