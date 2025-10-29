@@ -1,5 +1,5 @@
 ---
-title: "shayhai: Exploring the Burden of Healthcare-associated Infections"
+title: "shayhai"
 author: "Tzu-Hsuan, Yang"
 date: "2025-11-03"
 output: 
@@ -37,7 +37,7 @@ After this vignette, you should be able to:
 
 4. understand what the interactive Shiny app can show you
 
-## Installation
+## Usage
 
 ``` r
 # install.packages("pak")
@@ -115,7 +115,7 @@ germany_summary
 
 Below is a simple bar plot based on the German PPS totals.
 
-```{r}
+```{r fig.alt="Bar plot showing estimated annual HAIs by infection type in the German PPS sample"}
 library(dplyr)
 library(ggplot2)
 

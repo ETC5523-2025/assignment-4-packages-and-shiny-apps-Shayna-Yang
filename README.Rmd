@@ -13,14 +13,18 @@ knitr::opts_chunk$set(
 )
 ```
 
-# BHAIExplore
+# shayhai
 
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of shayhai is to ...
+## Introduction
 
-## Installation
+shayhai is a teaching-focused R package for exploring the burden of healthcare-associated infections (HAIs) using simulated datasets. It provides tidy data, helper functions, and an interactive Shiny app to summarise and visualise HAI burden — including infection counts, attributable deaths, and disability-adjusted life years (DALYs).
+
+This package is designed for coursework, demos, and data communication exercises.
+
+## Usage
 
 You can install the development version of shayhai from [GitHub](https://github.com/) with:
 
@@ -28,28 +32,92 @@ You can install the development version of shayhai from [GitHub](https://github.
 # install.packages("pak")
 pak::pak("ETC5523-2025/assignment-4-packages-and-shiny-apps-Shayna-Yang")
 ```
+Load the package:
 
-## Example
-
-This is a basic example which shows you how to solve a common problem:
-
-```{r example}
+```{r}
 library(shayhai)
-## basic example code
 ```
 
-What is special about using `README.Rmd` instead of just `README.md`? You can include R chunks like so:
+## Data Included
 
-```{r cars}
-summary(cars)
+The package ships with two small simulated datasets:
+
+- `shayhai_cases` — German PPS sample (2011)
+
+- `shayhai_cases_ecdc` — EU/EEA PPS sample (2011–2012)
+
+Each row represents a simulated “case” weighted to reflect the national burden.
+Key variables include:
+
+- infection_type: infection category (`HAP`, `SSI`, `BSI`, `UTI`, `CDI`)
+
+- `weight_pop`: population weight for national scaling
+
+- Demographic and infection descriptors (used in filtering and plotting)
+
+Example preview:
+
+```{r}
+head(shayhai_cases)
 ```
 
-You'll still need to render `README.Rmd` regularly, to keep `README.md` up-to-date. `devtools::build_readme()` is handy for this.
+## Shiny App
 
-You can also embed plots, for example:
+The package includes an interactive dashboard to explore infection burden by type, survey module, and demographic group.
 
-```{r pressure, echo = FALSE}
-plot(pressure)
+App features:
+
+- Bubble plot: HAIs vs deaths, bubble size = DALYs
+
+- Bar plot: Compare German PPS vs ECDC PPS (with 95% uncertainty intervals)
+
+- Age pyramid: DALYs by sex and age group
+
+Launch the app:
+
+```{r}
+shayhai::run_app()
 ```
 
-In that case, don't forget to commit and push the resulting figure files, so they display on GitHub and CRAN.
+## Data Sources
+
+The simulated datasets mirror the structure of two major PPS surveys:
+
+- German PPS (2011): 46 hospitals, 9,626 patients
+
+- EU/EEA PPS (2011–2012): 273,753 patients across 29 countries
+
+Metrics (HAIs, deaths, DALYs, YLL, YLD) follow the methodology of the Burden of Healthcare-Associated Infections (BHAI) framework as described in:
+
+Zacher B, Haller S, Willrich N, et al. Application of a new methodology and R package reveals a high burden of healthcare-associated infections (HAI) in Germany compared to the average in the European Union/European Economic Area, 2011 to 2012. Euro Surveill. 2019;24(46):1900135. [https://doi.org/10.2807/1560-7917.ES.2019.24.46.1900135](https://doi.org/10.2807/1560-7917.ES.2019.24.46.1900135)
+
+These data are simplified for educational use in ETC5523: Communicating with Data.
+
+## Documentation
+
+Full documentation and examples:
+
+**Site home: **[https://ETC5523-2025.github.io/assignment-4-packages-and-shiny-apps-Shayna-Yang](https://ETC5523-2025.github.io/assignment-4-packages-and-shiny-apps-Shayna-Yang)
+
+Blog Post for BHAI analysis:
+
+**Blog site: **[Germany’s Hidden Hospital Infection Burden: What the BHAI R Package Revealed](https://etc5523-2025.github.io/assignment-3-creating-a-blog-Shayna-Yang/posts/HAIs%20Burden%20in%20Germany/)
+
+## License
+
+This package is released under the MIT License. 
+See the included LICENSE file for details.
+
+## Author
+
+Tzu-Hsuan, Yang (Author & Maintainer)
+
+## Acknowledgements
+
+- Package infrastructure: `usethis`, `devtools`, `roxygen2`
+
+- Data wrangling: `dplyr`, `tidyr`, `scales`
+
+- Visualisation: `ggplot2`, `plotly`, `shiny`
+
+- Concept inspired by the BHAI methodology [(Zacher et al., 2019)](https://doi.org/10.2807/1560-7917.ES.2019.24.46.1900135)

@@ -16,8 +16,7 @@ Description: A teaching-focused package for exploring the burden of
     interactive Shiny app to visualise HAI burden by infection type, survey 
     module, and demographic group.
 License: MIT + file LICENSE
-URL: https://ETC5523-2025.github.io/assignment-4-packages -and-shiny-apps-Shayna-Yang,
-    https://github.com/ETC5523-2025/assignment-4-packages-and-shiny-apps-Shayna-Yang
+URL: https://ETC5523-2025.github.io/assignment-4-packages-and-shiny-apps-Shayna-Yang, https://github.com/ETC5523-2025/assignment-4-packages-and-shiny-apps-Shayna-Yang
 BugReports: https://github.com/ETC5523-2025/assignment-4-packages-and-shiny-apps-Shayna-Yang/issues
 Encoding: UTF-8
 LazyData: true
