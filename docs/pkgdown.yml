@@ -1,0 +1,9 @@
+pandoc: 3.6.3
+pkgdown: 2.1.3
+pkgdown_sha: ~
+articles:
+  shayhai: shayhai.html
+last_built: 2025-10-29T06:36Z
+urls:
+  reference: https://ETC5523-2025.github.io/assignment-4-packages-and-shiny-apps-Shayna-Yang/reference
+  article: https://ETC5523-2025.github.io/assignment-4-packages-and-shiny-apps-Shayna-Yang/articles
