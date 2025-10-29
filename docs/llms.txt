@@ -14,7 +14,8 @@ exercises.
 ## Usage
 
 You can install the development version of shayhai from
-[GitHub](https://github.com/) with:
+[GitHub](https://github.com/ETC5523-2025/assignment-4-packages-and-shiny-apps-Shayna-Yang)
+with:
 
 ``` r
 # install.packages("pak")
@@ -29,7 +30,7 @@ library(shayhai)
 
 ### Data Included
 
-The package ships with two small simulated datasets:
+The package ships with two simulated datasets:
 
 - `shayhai_cases` — German PPS sample (2011)
 
