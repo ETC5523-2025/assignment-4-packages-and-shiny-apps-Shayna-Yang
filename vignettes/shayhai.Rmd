@@ -40,19 +40,6 @@ After this vignette, you should be able to:
 
 4. understand what the interactive Shiny app can show you
 
-## Usage
-
-``` r
-# install.packages("pak")
-pak::pak("ETC5523-2025/assignment-4-packages-and-shiny-apps-Shayna-Yang")
-```
-
-Load the package:
-
-``` r
-library(shayhai)
-```
-
 ## Data in shayhai
 
 Two core data frames ship with the package:
@@ -84,7 +71,9 @@ The EU/EEA sample:
 head(shayhai_cases_ecdc)
 ```
 
-## Summarising Table of Burden by Infection Type
+## Usage
+
+### Summarising Table of Burden by Infection Type
 
 
 The function `summarise_burden_totals()` aggregates a case-level dataset (either   `shayhai_cases` or `shayhai_cases_ecdc`) and returns per-infection totals for:
@@ -114,7 +103,7 @@ germany_summary
 
 *Higher values = higher public health impact for that infection type*
 
-## Quick Visual: Which HAI type has the most estimated HAIs?
+### Quick Visual: Which HAI type has the most estimated HAIs?
 
 Below is a simple bar plot based on the German PPS totals.
 
@@ -122,7 +111,7 @@ Below is a simple bar plot based on the German PPS totals.
 
 This is the kind of figure you could drop into a report to communicate “which infection types matter most”.
 
-## Using the Shiny app
+### Using the Shiny app
 
 The package also includes an interactive Shiny dashboard (shayhai::run_app()) to visually explore burden across infections, demographic groups, and regions.
 
@@ -130,7 +119,7 @@ The app has three main plot views plus a summary table.
 
 Here’s how to interpret each one:
 
-### 1. Bubble plot: DALYs vs deaths vs cases
+#### 1. Bubble plot: DALYs vs deaths vs cases
 
 This view matches what you see in the app’s “**Bubble plot**” tab.
 
@@ -150,7 +139,7 @@ How to use it:
 
 - Hover on a bubble to see all the values at once.
 
-### 2. Bar plot with 95% UI
+#### 2. Bar plot with 95% UI
 
 This view corresponds to the app tab “**Bar plot with 95% UI**”.
 
@@ -168,7 +157,7 @@ How to use it:
 
 - The filters on the left also let you choose which infection types to include.
 
-### 3. Age pyramid: Weighted DALYs by gender and age group
+#### 3. Age pyramid: Weighted DALYs by gender and age group
 
 This view corresponds to the app tab “**Age pyramid**”.
 
