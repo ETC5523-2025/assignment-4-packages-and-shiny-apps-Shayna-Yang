@@ -2,10 +2,7 @@
 title: "shayhai"
 author: "Tzu-Hsuan, Yang"
 date: "2025-11-03"
-output: 
-  rmarkdown::html_vignette:
-    toc: true
-    toc_depth: 2
+output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{shayhai}
   %\VignetteEngine{knitr::rmarkdown}
@@ -17,6 +14,12 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
+```
+
+```{r setup, echo=FALSE}
+library(shayhai)
+library(dplyr)
+library(ggplot2)
 ```
 
 ## Introduction
@@ -46,7 +49,7 @@ pak::pak("ETC5523-2025/assignment-4-packages-and-shiny-apps-Shayna-Yang")
 
 Load the package:
 
-```{r}
+``` r
 library(shayhai)
 ```
 
@@ -116,9 +119,6 @@ germany_summary
 Below is a simple bar plot based on the German PPS totals.
 
 ```{r fig.alt="Bar plot showing estimated annual HAIs by infection type in the German PPS sample"}
-library(dplyr)
-library(ggplot2)
-
 germany_summary |>
   ggplot(aes(x = infection_type, y = n_hai_est, fill = infection_type)) +
   geom_col() +

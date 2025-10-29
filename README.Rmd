@@ -34,9 +34,9 @@ pak::pak("ETC5523-2025/assignment-4-packages-and-shiny-apps-Shayna-Yang")
 ```
 Load the package:
 
-  ```{r}
-  library(shayhai)
-  ```
+``` {r}
+library(shayhai)
+```
 
 ### Data Included
 
@@ -73,7 +73,22 @@ App features:
 
 - Age pyramid: DALYs by sex and age group
 
-You can explore the interactive [Shiny app](https://etc5523-2025.github.io/assignment-4-packages-and-shiny-apps-Shayna-Yang/articles/Examples.html) included in the package.
+You can explore the interactive [Shiny app](https://etc5523-2025.github.io/assignment-4-packages-and-shiny-apps-Shayna-Yang/articles/shayhai.html#using-the-shiny-app) included in the package.
+
+<a href="https://etc5523-2025.github.io/assignment-4-packages-and-shiny-apps-Shayna-Yang/articles/shayhai.html#bubble-plot-dalys-vs-deaths-vs-cases">
+  <img width="350" height="200" src="https://raw.githubusercontent.com/ETC5523-2025/assignment-4-packages-and-shiny-apps-Shayna-Yang/main/man/figures/bubble_example.png"
+       alt="Bubble plot example"></img>
+</a>
+<a href="https://etc5523-2025.github.io/assignment-4-packages-and-shiny-apps-Shayna-Yang/articles/shayhai.html#bar-plot-with-95-ui">
+  <img width="350" height="200"
+       src="https://raw.githubusercontent.com/ETC5523-2025/assignment-4-packages-and-shiny-apps-Shayna-Yang/main/man/figures/bar_example.png"
+       alt="Bar plot example"></img>
+</a>
+<a href="https://etc5523-2025.github.io/assignment-4-packages-and-shiny-apps-Shayna-Yang/articles/shayhai.html#age-pyramid-weighted-dalys-by-gender-and-age-group">
+  <img width="350" height="200"
+       src="https://raw.githubusercontent.com/ETC5523-2025/assignment-4-packages-and-shiny-apps-Shayna-Yang/main/man/figures/agepyramid_example.png"
+       alt="Age pyramid example"></img>
+</a>
 
 ## Data Sources
 
