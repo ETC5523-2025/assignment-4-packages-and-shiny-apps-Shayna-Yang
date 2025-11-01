@@ -46,7 +46,7 @@ ui <- navbarPage(
     tags$link(
       rel = "stylesheet",
       type = "text/css",
-      href = "app.css"
+      href = "app.css?v=3"
     )
   ),
 
@@ -71,6 +71,14 @@ ui <- navbarPage(
               "Each bubble = infection type; ",
               "X = Number of HAIs, Y = Attributable deaths; ",
               "Bubble size = DALYs; Color = Survey module (German PPS / ECDC PPS)."
+            ),
+            tags$div(class = "example-interpretation",
+                     tags$h5("How to Interpret"),
+                     tags$p(
+                       "Each bubble is an infection type. If a bubble sits far right it means more HAIs; ",
+                       "if it is higher it means more attributable deaths. A larger bubble means more DALYs. ",
+                       "Comparing colors shows differences between the German PPS and the ECDC PPS."
+                     )
             )
         )
       )
@@ -113,7 +121,15 @@ ui <- navbarPage(
         width = 9,
         div(class = "card-box",
             h4("Annual burden by infection type"),
-            plotlyOutput("bar_plot", height = "520px")
+            plotlyOutput("bar_plot", height = "520px"),
+            tags$div(class = "example-interpretation",
+                     tags$h5("How to Interpret"),
+                     tags$p(
+                       "For each infection type, compare the two bars (German PPS vs ECDC PPS). ",
+                       "Taller bars indicate higher burden in the selected metric (Deaths or DALYs). ",
+                       "Error bars show a placeholder 95% uncertainty interval (±10%)."
+                     )
+            )
         )
       )
     )
@@ -151,6 +167,14 @@ ui <- navbarPage(
             tags$small(
               "Left = Female, Right = Male; Width = total DALYs. ",
               "Use filters to focus on a specific infection or demographic group."
+            ),
+            tags$div(class = "example-interpretation",
+                     tags$h5("How to Interpret"),
+                     tags$p(
+                       "The left side shows females (negative values for plotting), the right shows males. ",
+                       "Wider bars indicate more DALYs in that age–gender group. ",
+                       "Look for where the bars widen: concentration at older ages suggests burden among older adults."
+                     )
             )
         )
       )

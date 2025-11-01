@@ -239,4 +239,5 @@ European point prevalence survey data.
 
 This vignette was developed for the ETC5523 Communicating with Data
 assignment. Reuse follows the package LICENSE terms; interpretation and
-errors are my own.
+errors are my own. Simulated data were produced with assistance from AI
+tools for illustrative purposes only.

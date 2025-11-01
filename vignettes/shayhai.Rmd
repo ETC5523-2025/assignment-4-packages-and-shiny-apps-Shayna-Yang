@@ -195,4 +195,4 @@ This vignette is intended for exploring and communicating results, not for clini
 
 The burden‐estimation framework used here draws on the general principles of the Burden of Healthcare-Associated Infections (BHAI) methodology by [Zacher et al., 2019](https://doi.org/10.2807/1560-7917.ES.2019.24.46.1900135), which models infection incidence, attributable mortality, and DALYs from European point prevalence survey data.
 
-This vignette was developed for the ETC5523 Communicating with Data assignment. Reuse follows the package LICENSE terms; interpretation and errors are my own.
+This vignette was developed for the ETC5523 Communicating with Data assignment. Reuse follows the package LICENSE terms; interpretation and errors are my own. Simulated data were produced with assistance from AI tools for illustrative purposes only.

@@ -69,3 +69,19 @@ h1, h2, h3, h4, h5 {
 input[type="checkbox"] {
   accent-color: #134074;
 }
+
+/* Example section */
+.example-interpretation {
+  margin-top: 0.5rem;
+  padding: 0.9rem 1rem;
+  border-left: 6px solid #415a77;
+  background: rgba(174,195,176,0.18);
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+.example-interpretation h5 {
+  margin: 0 0 0.5rem 0;
+  font-weight: 700;
+  color: #0d1b2a;
+}
+.example-interpretation p { margin: 0.3rem 0; }

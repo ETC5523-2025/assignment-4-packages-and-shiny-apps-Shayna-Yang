@@ -140,3 +140,6 @@ Tzu-Hsuan, Yang (Author & Maintainer)
 
 - Concept inspired by the BHAI methodology [(Zacher et al.,
   2019)](https://doi.org/10.2807/1560-7917.ES.2019.24.46.1900135)
+
+Simulated datasets were produced with partial AI assistance for
+illustrative purposes only.
