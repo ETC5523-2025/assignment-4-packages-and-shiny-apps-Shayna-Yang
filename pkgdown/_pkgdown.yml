@@ -2,19 +2,12 @@ url: https://ETC5523-2025.github.io/assignment-4-packages-and-shiny-apps-Shayna-
 
 template:
   bootstrap: 5
+  light-switch: true
 
 navbar:
-  title: "shayhai"
-  left:
-    - text: "Examples"
-      href: articles/shayhai.html   # you only have one vignette now; keep same link
-    - text: "Reference"
-      href: reference/index.html
-  right:
-    - icon: fab fa-github
-      href: https://github.com/ETC5523-2025/assignment-4-packages-and-shiny-apps-Shayna-Yang
-      aria-label: "GitHub repository"
-    - search: true
+  structure:
+    left: [intro, reference, articles]
+    right: [github, search, lightswitch]
 
 home:
   title: "shayhai"
@@ -44,8 +37,3 @@ reference:
       - choose_sample_cases
       - prep_bubble_data
       - summarise_burden_totals
-
-articles:
-  - title: "Examples"
-    contents:
-      - shayhai
